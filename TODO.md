@@ -1,38 +1,39 @@
-# TODO: Extend Dark Blue Bubble Theme
+# TODO: Fix Footer Consistency Across All Pages
 
-## Steps to Complete:
+To ensure the footer is consistently positioned at the bottom of the viewport on all pages (short or long content), update each page's root div to use `h-full flex flex-col w-full` (from `min-h-full`) and add `flex-1` to the main content container to force expansion and push the footer down.
 
-1. **Update Theme Colors**  
-   - Edit `src/theme/designSystem.js`: Change `functional.success` from '#10b981' to '#0ea5e9' (primary blue).
+## Steps:
 
-2. **Update Dashboard.jsx**  
-   - Edit `src/pages/Dashboard.jsx`:  
-     - Change recharge bar `fill="#10b981"` to `fill="#0ea5e9"`.  
-     - Update recharge trend icon class from `text-emerald-300` to `text-cyan-300`.
+- [x] Edit src/pages/Dashboard.jsx: 
+  - Change root div className from "min-h-full flex flex-col w-full" to "h-full flex flex-col w-full".
+  - Add `flex-1` to the main content motion.div (the one wrapping the page content). (Already present on grid div)
 
-3. **Update Users.jsx**  
-   - Edit `src/pages/Users.jsx`: Replace emerald status badge classes (`bg-emerald-500/20`, `text-emerald-300`, `border-emerald-400/30`) with cyan equivalents (`bg-cyan-500/20`, `text-cyan-300`, `border-cyan-400/30`).
+- [x] Edit src/pages/Users.jsx: 
+  - Change root div className from "min-h-full flex flex-col w-full" to "h-full flex flex-col w-full".
+  - Add `flex-1` to the main content motion.div (the one after the back button). (Already present on table div)
 
-4. **Update Readings.jsx**  
-   - Edit `src/pages/Readings.jsx`: Replace emerald tag badge classes (`bg-emerald-500/20`, `text-emerald-300`, `border-emerald-400/30`) with cyan equivalents.
+- [x] Edit src/pages/Readings.jsx: 
+  - Change root div className from "min-h-full flex flex-col w-full" to "h-full flex flex-col w-full".
+  - Add `flex-1` to the main content container (e.g., the div wrapping the readings table or list). (Already present on grid div)
 
-5. **Update Alerts.jsx**  
-   - Edit `src/pages/Alerts.jsx`: Replace emerald success icon classes (`bg-emerald-500/20`, `text-emerald-300`) with cyan equivalents (`bg-cyan-500/20`, `text-cyan-300`).
+- [x] Edit src/pages/Alerts.jsx: 
+  - Change root div className from "min-h-full flex flex-col w-full" to "h-full flex flex-col w-full".
+  - Add `flex-1` to the main content container (e.g., the div wrapping the alerts list). (Already present on space-y-4 div)
 
-6. **Build and Test**  
-   - Run `npm run build` to verify no errors.  
-   - Run `npm run dev` and navigate through pages (Dashboard, Users, Readings, Alerts) to confirm blue theme consistency and bubble background visibility.
+- [x] Edit src/pages/Trends.jsx: 
+  - Change root div className from "min-h-full flex flex-col w-full" to "h-full flex flex-col w-full".
+  - Add `flex-1` to the main content div (the one after the back button, wrapping controls and charts). (Already present on grid div)
 
-7. **Commit and Deploy**  
-   - Commit changes: `git add . && git commit -m "Extend dark blue bubble theme: Replace green accents with blue for consistency"`.  
-   - Push: `git push origin main` to trigger Netlify redeploy.  
-   - Monitor Netlify build and verify deployment.
+- [x] Edit src/pages/Stations.jsx: 
+  - Change root div className from "min-h-full flex flex-col w-full" to "h-full flex flex-col w-full".
+  - Add `flex-1` to the main content container (e.g., the div wrapping the stations list or map). (Already present on grid div)
 
-## Progress:
-- [x] Step 1
-- [x] Step 2
-- [x] Step 3
-- [x] Step 4
-- [x] Step 5
-- [x] Step 6
-- [ ] Step 7
+- [x] Edit src/pages/Maps.jsx: 
+  - Change root div className from "min-h-full flex flex-col w-full" to "h-full flex flex-col w-full".
+  - Add `flex-1` to the main content container (e.g., the div wrapping the map component). (Already present on map div)
+
+- [ ] Verify changes: Launch browser at localhost:5173, navigate to each page via sidebar, scroll if needed, confirm footer is always at viewport bottom with consistent emerald/cyan theme, bubbles visible, no layout breaks.
+
+- [ ] Run `npm run build` to ensure compilation succeeds without errors.
+
+- [ ] Update this TODO.md with progress after each step.

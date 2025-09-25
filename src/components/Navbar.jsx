@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Droplets, Home, Info, Moon, Sun } from 'lucide-react';
 import { useApp } from '../App';
 
@@ -14,31 +15,27 @@ const Navbar = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <button 
+          <motion.button
             onClick={() => setCurrentView('landing')}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-700/40 hover:bg-emerald-700/60 text-white transition-all duration-200"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-700/40 hover:bg-emerald-700/60 text-white transition-all duration-200 shadow-lg hover:shadow-emerald-500/25"
+            whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)' }}
+            whileTap={{ scale: 0.95 }}
           >
             <Home size={16} className="text-emerald-300" />
             <span className="font-medium">Home</span>
-          </button>
+          </motion.button>
           
           <span className="text-sm text-emerald-100 capitalize hidden sm:block">{currentView}</span>
           
-          <button
-            onClick={toggleTheme}
-            className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-700/40 hover:bg-emerald-700/60 text-white transition-all duration-200"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <Sun size={16} className="text-emerald-300" /> : <Moon size={16} className="text-emerald-300" />}
-          </button>
-          
-          <button
+          <motion.button
             onClick={() => setShowAbout(true)}
-            className="p-1.5 rounded-full bg-emerald-700/40 hover:bg-emerald-700/60 text-white transition-all duration-200"
+            className="p-1.5 rounded-full bg-emerald-700/40 hover:bg-emerald-700/60 text-white transition-all duration-200 shadow-lg hover:shadow-emerald-500/25"
             aria-label="About"
+            whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)' }}
+            whileTap={{ scale: 0.95 }}
           >
             <Info size={18} className="text-emerald-300" />
-          </button>
+          </motion.button>
         </div>
       </div>
     </header>

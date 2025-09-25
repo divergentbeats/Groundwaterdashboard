@@ -3,7 +3,7 @@ import { Droplets } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-cyan-900/30 via-emerald-900/20 to-cyan-900/30 border-t border-emerald-800/30 py-4 px-6">
+    <footer className="bg-gradient-to-r from-cyan-900/30 via-emerald-900/20 to-cyan-900/30 border-t border-emerald-800/30 py-4 px-6 shadow-lg">
       <div className="w-full flex flex-col sm:flex-row justify-between items-center px-4">
         <div className="flex items-center gap-2 mb-3 sm:mb-0">
           <Droplets className="text-emerald-400" size={18} />

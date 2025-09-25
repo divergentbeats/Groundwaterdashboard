@@ -13,7 +13,7 @@ const Maps = () => {
   const mapCenter = [20.5937, 78.9629]; // Center of India
 
   return (
-    <div className="min-h-full flex flex-col w-full">
+    <div className="h-full flex flex-col w-full">
       {/* Back to Home Button */}
       <motion.button
         whileHover={{ scale: 1.05, y: -2 }}

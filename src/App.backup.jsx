@@ -248,8 +248,8 @@ const Landing = () => {
               ].map((feature, i) => (
                 <motion.div
                   key={i}
-                  className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-cyan-400/30"
-                  whileHover={{ y: -5, scale: 1.02, boxShadow: '0 0 25px rgba(34, 211, 238, 0.4)' }}
+                  className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 cursor-pointer"
+                  whileHover={{ y: -5, scale: 1.02 }}
                   transition={{ duration: 0.3 }}
                   onClick={() => setCurrentView(feature.view)}
                 >
@@ -282,10 +282,9 @@ const Landing = () => {
               ].map((stat, i) => (
                 <motion.div
                   key={i}
-                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 text-white flex items-center gap-6 hover:bg-white/15 transition-all duration-300 shadow-lg hover:shadow-cyan-400/20"
-                  whileHover={{ y: -3, scale: 1.02 }}
-                  animate={{ boxShadow: ['0 0 0 rgba(34, 211, 238, 0)', '0 0 20px rgba(34, 211, 238, 0.3)', '0 0 0 rgba(34, 211, 238, 0)'] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: i * 0.5 }}
+                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 text-white flex items-center gap-6 hover:bg-white/15 transition-all duration-300"
+                  whileHover={{ y: -3 }}
+                  transition={{ duration: 0.3 }}
                 >
                   <div className="p-5 rounded-full bg-white/20 text-white shadow-inner">
                     {stat.icon}
@@ -434,5 +433,3 @@ function App() {
 }
 
 export default App;
-
-

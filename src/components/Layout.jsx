@@ -6,7 +6,7 @@ import BubbleBackground from './BubbleBackground';
 
 const Layout = ({ children }) => {
   return (
-    <div className="w-full h-screen min-h-screen flex flex-col">
+    <div className="w-full min-h-screen flex flex-col">
       <Navbar />
       <div className="flex flex-1 relative">
         <Sidebar />
