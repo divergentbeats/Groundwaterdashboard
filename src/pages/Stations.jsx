@@ -23,7 +23,7 @@ const Stations = () => {
 
       <div className="mb-4 flex-1">
         <h1 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-          <Droplets className="text-cyan-300" size={24} />
+          <Droplets className="text-emerald-300" size={24} />
           Monitoring Stations
         </h1>
         <p className="text-cyan-100 text-sm">
@@ -55,7 +55,7 @@ const StationCard = ({ station }) => {
               <h3 className="text-sm font-medium text-cyan-100">Current Water Level</h3>
               <div className="mt-1 flex items-baseline">
                 <p className="text-2xl font-bold text-white">{station.currentLevel}m</p>
-                <span className={`ml-2 text-xs ${station.currentLevel < 8 ? 'text-amber-300' : 'text-cyan-300'}`}>
+                <span className={`ml-2 text-xs ${station.currentLevel < 8 ? 'text-amber-300' : 'text-emerald-300'}`}>
                   {station.currentLevel < 8 ? 'Low' : 'Normal'}
                 </span>
               </div>
@@ -65,7 +65,7 @@ const StationCard = ({ station }) => {
               <div className="mt-1 flex items-center">
                 <p className="text-2xl font-bold text-white">{station.rechargeRate}</p>
                 <span className="ml-1 text-sm text-cyan-200">mm/day</span>
-                <TrendingUp className="ml-2 text-cyan-300" size={16} />
+                <TrendingUp className="ml-2 text-emerald-300" size={16} />
               </div>
             </div>
           </div>
@@ -78,9 +78,9 @@ const StationCard = ({ station }) => {
           <div className="mt-4 flex gap-2">
             <motion.button 
               whileHover={{ scale: 1.02 }}
-              className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-cyan-500/20 backdrop-blur-md text-white font-medium border border-cyan-400/30 hover:bg-cyan-500/30 transition-all duration-300"
+              className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-emerald-500/20 backdrop-blur-md text-white font-medium border border-emerald-400/30 hover:bg-emerald-500/30 transition-all duration-300"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-green-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
               View Details
             </motion.button>
             <motion.button 
@@ -112,9 +112,9 @@ const StationCard = ({ station }) => {
               <Line 
                 type="monotone" 
                 dataKey="level" 
-                stroke="#0ea5e9" 
+                stroke="#10b981" 
                 strokeWidth={2} 
-                dot={{ fill: "#0ea5e9" }} 
+                dot={{ fill: "#10b981" }} 
               />
             </LineChart>
           </ResponsiveContainer>

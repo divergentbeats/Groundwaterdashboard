@@ -94,7 +94,7 @@ const Readings = () => {
             </div>
             <div className="p-4">
               <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
-                card.tag === 'NORMAL' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/30' :
+                card.tag === 'NORMAL' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' :
                 card.tag === 'LOW' ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :
                 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
               }`}>

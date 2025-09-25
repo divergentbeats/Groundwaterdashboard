@@ -1,6 +1,7 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { MapPin, Map as MapIcon } from 'lucide-react';
+import { MapPin, HomeIcon } from 'lucide-react';
 import { useApp } from '../App';
 import { designSystem } from '../theme/designSystem';
 import { createStationIcon } from '../utils/helpers';
@@ -8,7 +9,7 @@ import { mapConfig } from '../utils/constants';
 
 // Map View Component
 const Maps = () => {
-  const { stations } = useApp();
+  const { stations, setCurrentView } = useApp();
   const mapCenter = [20.5937, 78.9629]; // Center of India
 
   return (
@@ -20,17 +21,17 @@ const Maps = () => {
         onClick={() => setCurrentView('landing')}
         className="group relative mb-6 inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/20 backdrop-blur-md text-white font-semibold shadow-xl hover:shadow-2xl border border-white/30 transition-all duration-300 self-start"
       >
-        <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <span className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-green-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
         <HomeIcon size={18} />
         <span>Back to Home</span>
       </motion.button>
 
       <div className="mb-4 flex-1">
         <h1 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-          <MapPin className="text-cyan-300" size={24} />
+          <MapPin className="text-emerald-300" size={24} />
           Station Map
         </h1>
-        <p className="text-cyan-100 text-sm">
+        <p className="text-emerald-100 text-sm">
           Interactive map showing all groundwater monitoring stations across India
         </p>
       </div>
@@ -53,16 +54,16 @@ const Maps = () => {
                 key={station.id}
                 position={station.location}
                 icon={createStationIcon(
-                  station.currentLevel < 8 ? designSystem.colors.warning : designSystem.colors.primary
+                  station.currentLevel < 8 ? designSystem.colors.warning : designSystem.colors.emerald
                 )}
               >
                 <Popup>
                   <div className="p-1">
                     <h3 className="font-medium text-sm text-white">{station.name}</h3>
-                    <div className="text-xs mt-1 text-cyan-200">
+                    <div className="text-xs mt-1 text-emerald-200">
                       Current Level: {station.currentLevel}m
                     </div>
-                    <div className="text-xs text-cyan-200">
+                    <div className="text-xs text-emerald-200">
                       Recharge Rate: {station.rechargeRate} mm/day
                     </div>
                   </div>
@@ -78,12 +79,12 @@ const Maps = () => {
         <h3 className="text-sm font-medium mb-2 text-white">Map Legend</h3>
         <div className="flex gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-cyan-400"></div>
-            <span className="text-xs text-cyan-200">Normal Level</span>
+            <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+            <span className="text-xs text-emerald-200">Normal Level</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-            <span className="text-xs text-cyan-200">Low Level</span>
+            <span className="text-xs text-emerald-200">Low Level</span>
           </div>
         </div>
       </div>

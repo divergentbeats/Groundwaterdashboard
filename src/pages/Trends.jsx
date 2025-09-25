@@ -66,7 +66,7 @@ const Trends = () => {
 
       <div className="mb-4 flex-1">
         <h1 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-          <TrendingUp className="text-cyan-300" size={24} />
+          <TrendingUp className="text-emerald-300" size={24} />
           Water Level Trends
         </h1>
         <p className="text-cyan-100 text-sm">
@@ -85,7 +85,7 @@ const Trends = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 className={`px-4 py-2 text-sm transition-all duration-300 ${timeRange === '1y'
-                  ? 'bg-cyan-500/20 text-cyan-100 border-cyan-400/30'
+                  ? 'bg-emerald-500/20 text-emerald-100 border-emerald-400/30'
                   : 'bg-white/10 text-white hover:bg-white/20'}`}
                 onClick={() => setTimeRange('1y')}
               >
@@ -94,7 +94,7 @@ const Trends = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 className={`px-4 py-2 text-sm transition-all duration-300 ${timeRange === '7y'
-                  ? 'bg-cyan-500/20 text-cyan-100 border-cyan-400/30'
+                  ? 'bg-emerald-500/20 text-emerald-100 border-emerald-400/30'
                   : 'bg-white/10 text-white hover:bg-white/20'}`}
                 onClick={() => setTimeRange('7y')}
               >
@@ -160,9 +160,9 @@ const Trends = () => {
                   type="monotone"
                   dataKey="recharge"
                   name="Recharge (mm)"
-                  stroke="#0ea5e9"
+                  stroke="#10b981"
                   strokeWidth={2}
-                  dot={{ fill: "#0ea5e9" }}
+                  dot={{ fill: "#10b981" }}
                 />
               </LineChart>
             ) : chartType === 'bar' ? (
@@ -181,7 +181,7 @@ const Trends = () => {
                 <Legend wrapperStyle={{ color: 'white' }} />
                 <Bar dataKey="level" name="Water Level (m)" fill="#0ea5e9" />
                 <Bar dataKey="rainfall" name="Rainfall (mm)" fill="#38bdf8" />
-                <Bar dataKey="recharge" name="Recharge (mm)" fill="#0ea5e9" />
+                <Bar dataKey="recharge" name="Recharge (mm)" fill="#10b981" />
               </BarChart>
             ) : (
               <AreaChart data={data}>
@@ -215,8 +215,8 @@ const Trends = () => {
                   type="monotone"
                   dataKey="recharge"
                   name="Recharge (mm)"
-                  stroke="#0ea5e9"
-                  fill="rgba(14,165,233,0.2)"
+                  stroke="#10b981"
+                  fill="rgba(16,185,129,0.2)"
                 />
               </AreaChart>
             )}
@@ -252,9 +252,9 @@ const Trends = () => {
                     type="monotone"
                     dataKey="level"
                     name={station.name}
-                    stroke={["#0ea5e9", "#38bdf8", "#0ea5e9"][index % 3]}
+                    stroke={["#0ea5e9", "#10b981", "#38bdf8"][index % 3]}
                     strokeWidth={2}
-                    dot={{ fill: ["#0ea5e9", "#38bdf8", "#0ea5e9"][index % 3] }}
+                    dot={{ fill: ["#0ea5e9", "#10b981", "#38bdf8"][index % 3] }}
                   />
                 ))}
               </LineChart>
@@ -281,7 +281,7 @@ const Trends = () => {
                 />
                 <Legend wrapperStyle={{ color: 'white' }} />
                 <Bar dataKey="rainfall" name="Rainfall (mm)" fill="#38bdf8" />
-                <Bar dataKey="recharge" name="Recharge (mm)" fill="#0ea5e9" />
+                <Bar dataKey="recharge" name="Recharge (mm)" fill="#10b981" />
               </BarChart>
             </ResponsiveContainer>
           </div>

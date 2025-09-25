@@ -17,6 +17,14 @@ export const designSystem = {
       800: '#075985',
       900: '#0c4a6e',
     },
+    // Emerald green for balanced accents
+    emerald: {
+      300: '#6ee7b7',
+      400: '#34d399',
+      500: '#10b981',
+      600: '#059669',
+      700: '#047857',
+    },
     // Slate for UI elements
     slate: {
       50: '#f8fafc',
@@ -38,7 +46,8 @@ export const designSystem = {
     },
     // Functional colors
     functional: {
-      success: '#0ea5e9',
+      success: '#10b981',
+      accent: '#0ea5e9',
       warning: '#f59e0b',
       error: '#ef4444',
       info: '#3b82f6',

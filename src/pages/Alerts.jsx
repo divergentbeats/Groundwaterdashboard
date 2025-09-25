@@ -64,7 +64,7 @@ const Alerts = () => {
 
       <div className="mb-4 flex-1">
         <h1 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-          <Bell className="text-cyan-300" size={24} />
+          <Bell className="text-emerald-300" size={24} />
           System Alerts
         </h1>
         <p className="text-cyan-100 text-sm">
@@ -102,8 +102,8 @@ const Alerts = () => {
           </div>
         </div>
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 flex items-center hover:bg-white/15 transition-all duration-300">
-          <div className="rounded-full bg-cyan-500/20 p-3 mr-3">
-            <CheckCircle className="text-cyan-300" size={20} />
+          <div className="rounded-full bg-emerald-500/20 p-3 mr-3">
+            <CheckCircle className="text-emerald-300" size={20} />
           </div>
           <div>
             <p className="text-sm text-cyan-100">Resolved</p>
@@ -213,7 +213,7 @@ const Alerts = () => {
           </motion.button>
           <motion.button 
             whileHover={{ scale: 1.05 }}
-            className="p-2 rounded-lg bg-cyan-500/20 text-cyan-100 border border-cyan-400/30 min-w-[2.5rem] text-center hover:bg-cyan-500/30 transition-all duration-300"
+            className="p-2 rounded-lg bg-emerald-500/20 text-emerald-100 border border-emerald-400/30 min-w-[2.5rem] text-center hover:bg-emerald-500/30 transition-all duration-300"
           >
             1
           </motion.button>

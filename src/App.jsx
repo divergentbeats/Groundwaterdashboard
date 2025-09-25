@@ -227,7 +227,7 @@ const Landing = () => {
                   desc: 'Live DWLR water level updates across India.'
                 },
                 {
-                  icon: <GaugeCircle className="text-emerald-300" size={24} />,
+                  icon: <GaugeCircle className="text-cyan-300" size={24} />,
                   title: 'Recharge Estimates',
                   desc: 'Dynamic recharge insights from trends.'
                 },
