@@ -12,19 +12,31 @@ const Maps = () => {
   const mapCenter = [20.5937, 78.9629]; // Center of India
 
   return (
-    <div className="p-4 sm:p-6 w-full">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2 flex items-center gap-2">
-          <MapPin className="text-sky-600" size={24} />
+    <div className="min-h-full flex flex-col w-full">
+      {/* Back to Home Button */}
+      <motion.button
+        whileHover={{ scale: 1.05, y: -2 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setCurrentView('landing')}
+        className="group relative mb-6 inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/20 backdrop-blur-md text-white font-semibold shadow-xl hover:shadow-2xl border border-white/30 transition-all duration-300 self-start"
+      >
+        <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <HomeIcon size={18} />
+        <span>Back to Home</span>
+      </motion.button>
+
+      <div className="mb-4 flex-1">
+        <h1 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+          <MapPin className="text-cyan-300" size={24} />
           Station Map
         </h1>
-        <p className="text-slate-600 dark:text-slate-300 text-sm">
+        <p className="text-cyan-100 text-sm">
           Interactive map showing all groundwater monitoring stations across India
         </p>
       </div>
 
       {/* Map Card */}
-      <div className={designSystem.cards.container}>
+      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 flex-1">
         <div className="h-[70vh] w-full rounded-xl overflow-hidden">
           <MapContainer
             center={mapCenter}
@@ -46,11 +58,11 @@ const Maps = () => {
               >
                 <Popup>
                   <div className="p-1">
-                    <h3 className="font-medium text-sm">{station.name}</h3>
-                    <div className="text-xs mt-1 text-slate-600">
+                    <h3 className="font-medium text-sm text-white">{station.name}</h3>
+                    <div className="text-xs mt-1 text-cyan-200">
                       Current Level: {station.currentLevel}m
                     </div>
-                    <div className="text-xs text-slate-600">
+                    <div className="text-xs text-cyan-200">
                       Recharge Rate: {station.rechargeRate} mm/day
                     </div>
                   </div>
@@ -62,16 +74,16 @@ const Maps = () => {
       </div>
 
       {/* Legend */}
-      <div className="mt-4 p-4 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-        <h3 className="text-sm font-medium mb-2 text-slate-800 dark:text-slate-200">Map Legend</h3>
+      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 mt-4">
+        <h3 className="text-sm font-medium mb-2 text-white">Map Legend</h3>
         <div className="flex gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-sky-600"></div>
-            <span className="text-xs text-slate-600 dark:text-slate-300">Normal Level</span>
+            <div className="w-3 h-3 rounded-full bg-cyan-400"></div>
+            <span className="text-xs text-cyan-200">Normal Level</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-            <span className="text-xs text-slate-600 dark:text-slate-300">Low Level</span>
+            <span className="text-xs text-cyan-200">Low Level</span>
           </div>
         </div>
       </div>

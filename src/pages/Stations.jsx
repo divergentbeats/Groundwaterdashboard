@@ -55,7 +55,7 @@ const StationCard = ({ station }) => {
               <h3 className="text-sm font-medium text-cyan-100">Current Water Level</h3>
               <div className="mt-1 flex items-baseline">
                 <p className="text-2xl font-bold text-white">{station.currentLevel}m</p>
-                <span className={`ml-2 text-xs ${station.currentLevel < 8 ? 'text-amber-300' : 'text-emerald-300'}`}>
+                <span className={`ml-2 text-xs ${station.currentLevel < 8 ? 'text-amber-300' : 'text-cyan-300'}`}>
                   {station.currentLevel < 8 ? 'Low' : 'Normal'}
                 </span>
               </div>
@@ -65,7 +65,7 @@ const StationCard = ({ station }) => {
               <div className="mt-1 flex items-center">
                 <p className="text-2xl font-bold text-white">{station.rechargeRate}</p>
                 <span className="ml-1 text-sm text-cyan-200">mm/day</span>
-                <TrendingUp className="ml-2 text-emerald-300" size={16} />
+                <TrendingUp className="ml-2 text-cyan-300" size={16} />
               </div>
             </div>
           </div>

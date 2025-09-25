@@ -160,9 +160,9 @@ const Trends = () => {
                   type="monotone"
                   dataKey="recharge"
                   name="Recharge (mm)"
-                  stroke="#10b981"
+                  stroke="#0ea5e9"
                   strokeWidth={2}
-                  dot={{ fill: "#10b981" }}
+                  dot={{ fill: "#0ea5e9" }}
                 />
               </LineChart>
             ) : chartType === 'bar' ? (
@@ -181,7 +181,7 @@ const Trends = () => {
                 <Legend wrapperStyle={{ color: 'white' }} />
                 <Bar dataKey="level" name="Water Level (m)" fill="#0ea5e9" />
                 <Bar dataKey="rainfall" name="Rainfall (mm)" fill="#38bdf8" />
-                <Bar dataKey="recharge" name="Recharge (mm)" fill="#10b981" />
+                <Bar dataKey="recharge" name="Recharge (mm)" fill="#0ea5e9" />
               </BarChart>
             ) : (
               <AreaChart data={data}>
@@ -215,8 +215,8 @@ const Trends = () => {
                   type="monotone"
                   dataKey="recharge"
                   name="Recharge (mm)"
-                  stroke="#10b981"
-                  fill="rgba(16,185,129,0.2)"
+                  stroke="#0ea5e9"
+                  fill="rgba(14,165,233,0.2)"
                 />
               </AreaChart>
             )}
@@ -252,9 +252,9 @@ const Trends = () => {
                     type="monotone"
                     dataKey="level"
                     name={station.name}
-                    stroke={["#0ea5e9", "#38bdf8", "#10b981"][index % 3]}
+                    stroke={["#0ea5e9", "#38bdf8", "#0ea5e9"][index % 3]}
                     strokeWidth={2}
-                    dot={{ fill: ["#0ea5e9", "#38bdf8", "#10b981"][index % 3] }}
+                    dot={{ fill: ["#0ea5e9", "#38bdf8", "#0ea5e9"][index % 3] }}
                   />
                 ))}
               </LineChart>
@@ -281,7 +281,7 @@ const Trends = () => {
                 />
                 <Legend wrapperStyle={{ color: 'white' }} />
                 <Bar dataKey="rainfall" name="Rainfall (mm)" fill="#38bdf8" />
-                <Bar dataKey="recharge" name="Recharge (mm)" fill="#10b981" />
+                <Bar dataKey="recharge" name="Recharge (mm)" fill="#0ea5e9" />
               </BarChart>
             </ResponsiveContainer>
           </div>
