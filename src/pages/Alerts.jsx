@@ -102,8 +102,8 @@ const Alerts = () => {
           </div>
         </div>
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 flex items-center hover:bg-white/15 transition-all duration-300">
-          <div className="rounded-full bg-emerald-500/20 p-3 mr-3">
-            <CheckCircle className="text-emerald-300" size={20} />
+          <div className="rounded-full bg-cyan-500/20 p-3 mr-3">
+            <CheckCircle className="text-cyan-300" size={20} />
           </div>
           <div>
             <p className="text-sm text-cyan-100">Resolved</p>

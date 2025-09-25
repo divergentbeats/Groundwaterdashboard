@@ -38,7 +38,7 @@ export const designSystem = {
     },
     // Functional colors
     functional: {
-      success: '#10b981',
+      success: '#0ea5e9',
       warning: '#f59e0b',
       error: '#ef4444',
       info: '#3b82f6',

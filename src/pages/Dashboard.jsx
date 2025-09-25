@@ -62,7 +62,7 @@ const Dashboard = () => {
         <StatCard 
           title="Recharge Rate" 
           value={`${avgRechargeRate.toFixed(1)} mm/day`} 
-          icon={<TrendingUp className="text-emerald-300" />}
+          icon={<TrendingUp className="text-cyan-300" />}
           trend="+0.2 from last month"
           trendDirection="up"
         />
@@ -172,7 +172,7 @@ const Dashboard = () => {
                 />
                 <Legend wrapperStyle={{ color: 'white' }} />
                 <Bar dataKey="level" name="Water Level (m)" fill="#0ea5e9" />
-                <Bar dataKey="recharge" name="Recharge Rate (mm/day)" fill="#10b981" />
+                <Bar dataKey="recharge" name="Recharge Rate (mm/day)" fill="#0ea5e9" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -185,7 +185,7 @@ const Dashboard = () => {
 const StatCard = ({ title, value, icon, trend, trendDirection }) => {
   const getTrendColor = () => {
     switch (trendDirection) {
-      case 'up': return 'text-emerald-300';
+      case 'up': return 'text-cyan-300';
       case 'down': return 'text-rose-300';
       default: return 'text-cyan-300';
     }
