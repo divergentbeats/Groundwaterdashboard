@@ -8,6 +8,7 @@ const Stations = () => {
   const { stations, setCurrentView, setSelectedStation } = useApp();
   const [currentPage, setCurrentPage] = useState(1);
   const [editingStation, setEditingStation] = useState(null);
+  const [expandedStation, setExpandedStation] = useState(null);
   const stationsPerPage = 3;
   const totalPages = Math.ceil(stations.length / stationsPerPage);
   const startIndex = (currentPage - 1) * stationsPerPage;
@@ -52,7 +53,12 @@ const Stations = () => {
 
       <div className="grid grid-cols-1 gap-6 flex-1">
         {currentStations.map((station) => (
-          <StationCard key={station.id} station={station} />
+          <StationCard
+            key={station.id}
+            station={station}
+            isExpanded={expandedStation === station.id}
+            onToggleExpand={() => setExpandedStation(expandedStation === station.id ? null : station.id)}
+          />
         ))}
       </div>
 
@@ -94,11 +100,12 @@ const Stations = () => {
   );
 };
 
-const StationCard = ({ station }) => {
+const StationCard = ({ station, isExpanded, onToggleExpand }) => {
   return (
-    <motion.div 
+    <motion.div
       className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 overflow-hidden hover:bg-white/15 transition-all duration-300"
       whileHover={{ y: -2 }}
+      animate={{ height: isExpanded ? 'auto' : 'auto' }} // Allow height to adjust
     >
       <div className="flex flex-col sm:flex-row gap-6">
         {/* Station Info */}
@@ -129,14 +136,42 @@ const StationCard = ({ station }) => {
               {station.latitude.toFixed(4)}, {station.longitude.toFixed(4)}
             </p>
           </div>
+          {isExpanded && (
+            <div className="mt-4 space-y-2">
+              <div>
+                <h3 className="text-sm font-medium text-cyan-100">Station ID</h3>
+                <p className="text-cyan-200">{station.id}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-cyan-100">City</h3>
+                <p className="text-cyan-200">{station.city}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-cyan-100">Status</h3>
+                <p className="text-cyan-200 capitalize">{station.status}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-cyan-100">Recharge Pattern</h3>
+                <p className="text-cyan-200 capitalize">{station.recharge_pattern}</p>
+              </div>
+            </div>
+          )}
           <div className="mt-4 flex gap-2">
             <motion.button
               whileHover={{ scale: 1.02 }}
-              onClick={() => { setSelectedStation(station.id); setCurrentView('Readings'); }}
+              onClick={onToggleExpand}
               className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-emerald-500/20 backdrop-blur-md text-cyan-50 font-medium border border-emerald-400/30 hover:bg-emerald-500/30 transition-all duration-300"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-green-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-              View Details
+              {isExpanded ? 'Hide Details' : 'View Details'}
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              onClick={() => { setSelectedStation(station.id); setCurrentView('Readings'); }}
+              className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-cyan-500/20 backdrop-blur-md text-cyan-50 font-medium border border-cyan-400/30 hover:bg-cyan-500/30 transition-all duration-300"
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              View Readings
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -165,12 +200,12 @@ const StationCard = ({ station }) => {
                   color: 'rgb(224 242 254)'
                 }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="level" 
-                stroke="#10b981" 
-                strokeWidth={2} 
-                dot={{ fill: "#10b981" }} 
+              <Line
+                type="monotone"
+                dataKey="level"
+                stroke="#10b981"
+                strokeWidth={2}
+                dot={{ fill: "#10b981" }}
               />
             </LineChart>
           </ResponsiveContainer>

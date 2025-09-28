@@ -10,6 +10,16 @@ import joblib
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 import os
+import random
+from data_ingestion import fetch_live_data
+
+# Live DWLR Telemetry Feeds (Mock for demo - replace with real URLs if found)
+LIVE_STATION_FEEDS = {
+    3: "https://mock-cgwb-api.example.com/station/bangalore/live",  # Bangalore DWLR Station - mock URL
+    4: "https://mock-cgwb-api.example.com/station/chennai/live",  # Chennai DWLR Station - mock URL
+    21: "https://mock-cgwb-api.example.com/station/mysore/live",  # Mysore DWLR Station - mock URL
+    # Add more if real feeds found: e.g., "TN_CRMN_Station1": "https://public.cgwb.gov.in/crmn/station1_live.csv"
+}
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes to allow frontend requests
@@ -58,6 +68,9 @@ def init_db():
     cursor.execute('DROP TABLE IF EXISTS water_levels')
     cursor.execute('DROP TABLE IF EXISTS stations')
     cursor.execute('DROP TABLE IF EXISTS predictions')
+    cursor.execute('DROP TABLE IF EXISTS alerts')
+    cursor.execute('DROP TABLE IF EXISTS alert_thresholds')
+    cursor.execute('DROP TABLE IF EXISTS live_readings')
 
     # Create stations table
     cursor.execute('''
@@ -114,44 +127,43 @@ def init_db():
             id INTEGER PRIMARY KEY,
             station_id INTEGER,
             role TEXT,
-            normal_max REAL DEFAULT 50,
-            warning_max REAL DEFAULT 100,
-            critical_max REAL DEFAULT 200,
-            emergency_min REAL DEFAULT 200,
+            normal_min REAL DEFAULT 5,
+            warning_min REAL DEFAULT 3,
+            critical_min REAL DEFAULT 1,
+            emergency_max REAL DEFAULT 1,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(station_id, role)
         )
     ''')
 
+    # Create live_readings table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS live_readings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            station_id INTEGER NOT NULL,
+            timestamp TEXT NOT NULL,
+            water_level REAL NOT NULL,
+            recharge_rate REAL NOT NULL,
+            battery REAL NOT NULL,
+            status TEXT NOT NULL,
+            FOREIGN KEY (station_id) REFERENCES stations (id)
+        )
+    ''')
+
     # Insert default global thresholds for each role (station_id NULL)
+    # Adjusted for actual data range (400-500m bgl): normal >=500, warning >=450, critical >=400, emergency <400
     default_thresholds = [
-        (None, 'farmer', 50, 100, 200, 200),
-        (None, 'stakeholder', 50, 100, 200, 200),
-        (None, 'policymaker', 50, 100, 200, 200),
-        (None, 'planner', 50, 100, 200, 200)
+        (None, 'farmer', 500, 450, 400, 350),
+        (None, 'stakeholder', 500, 450, 400, 350),
+        (None, 'policymaker', 500, 450, 400, 350),
+        (None, 'planner', 500, 450, 400, 350)
     ]
     cursor.executemany('''
-        INSERT OR IGNORE INTO alert_thresholds (station_id, role, normal_max, warning_max, critical_max, emergency_min)
+        INSERT OR IGNORE INTO alert_thresholds (station_id, role, normal_min, warning_min, critical_min, emergency_max)
         VALUES (?, ?, ?, ?, ?, ?)
     ''', default_thresholds)
 
-    # Generate initial alerts for all stations using policymaker role
-    for station_id in range(1, 21):
-        # Get latest prediction
-        pred_row = cursor.execute('''
-            SELECT predicted_level FROM predictions WHERE station_id = ? ORDER BY date DESC LIMIT 1
-        ''', (station_id,)).fetchone()
-        if pred_row:
-            predicted_level = pred_row['predicted_level']
-            alert_level = get_alert_status(station_id, 'policymaker', predicted_level)
-            message = f"Initial alert for station {station_id}: Level {predicted_level:.2f}m bgl - {alert_level.upper()}"
-            timestamp = datetime.now().isoformat()
-            cursor.execute('''
-                INSERT OR IGNORE INTO alerts (station_id, alert_level, message, timestamp)
-                VALUES (?, ?, ?, ?)
-            ''', (station_id, alert_level, message, timestamp))
-
-    # Insert sample stations (expanded to 20)
+    # Insert sample stations (expanded to 21, added Mysore)
     stations = [
         (1, 'Delhi DWLR Station', 'Delhi', 'New Delhi', 'Delhi', 28.7041, 77.1025),
         (2, 'Mumbai DWLR Station', 'Maharashtra', 'Mumbai', 'Mumbai', 19.076, 72.8777),
@@ -172,15 +184,16 @@ def init_db():
         (17, 'Coimbatore DWLR Station', 'Tamil Nadu', 'Coimbatore', 'Coimbatore', 11.0168, 76.9558),
         (18, 'Kochi DWLR Station', 'Kerala', 'Ernakulam', 'Kochi', 9.9312, 76.2673),
         (19, 'Visakhapatnam DWLR Station', 'Andhra Pradesh', 'Visakhapatnam', 'Visakhapatnam', 17.6868, 83.2185),
-        (20, 'Agra DWLR Station', 'Uttar Pradesh', 'Agra', 'Agra', 27.1767, 78.0081)
+        (20, 'Agra DWLR Station', 'Uttar Pradesh', 'Agra', 'Agra', 27.1767, 78.0081),
+        (21, 'Mysore DWLR Station', 'Karnataka', 'Mysore', 'Mysore', 12.2958, 76.6394)
     ]
     cursor.executemany('INSERT OR IGNORE INTO stations VALUES (?, ?, ?, ?, ?, ?, ?)', stations)
 
     cursor.execute('DELETE FROM water_levels')
 
-    # Load real historical data from CSV
-    df = pd.read_csv('data/cgwb_historical.csv')
-    mapping = {
+    # Load historical data from CSV
+    import csv
+    district_to_station = {
         'bengaluru': 3,
         'mumbai': 2,
         'new delhi': 1,
@@ -203,19 +216,90 @@ def init_db():
         'ernakulam': 18,
         'visakhapatnam': 19,
         'agra': 20,
+        'mysore': 21  # Add mock for Mysore if needed
     }
-    for _, row in df.iterrows():
-        dist_lower = str(row['District']).lower().strip()
-        if dist_lower in mapping:
-            station_id = mapping[dist_lower]
-            date = row['Date']
-            water_level = float(row['Water_Level_m_bgl'])
-            pattern = str(row['Recharge_Pattern'])
+
+    csv_path = 'data/cgwb_historical.csv'
+    if os.path.exists(csv_path):
+        with open(csv_path, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                district_lower = row['District'].lower().strip()
+                station_id = district_to_station.get(district_lower)
+                if station_id:
+                    date = row['Date']
+                    water_level_str = row['Water_Level_m_bgl']
+                    if water_level_str is not None and water_level_str != '':
+                        try:
+                            water_level = float(water_level_str)
+                            recharge_pattern = row['Recharge_Pattern']
+                            cursor.execute('INSERT OR IGNORE INTO water_levels (station_id, date, water_level, recharge_pattern) VALUES (?, ?, ?, ?)',
+                                           (station_id, date, water_level, recharge_pattern))
+                        except ValueError:
+                            print(f"Skipping invalid water level value: {water_level_str} for station {station_id}")
+                    else:
+                        print(f"Skipping row with missing water level for station {station_id}")
+        print("Loaded historical data from CSV")
+    else:
+        print("CSV not found, skipping load")
+
+    # Generate comprehensive synthetic data for all stations from 2024-01-01 to present
+    # This ensures at least a year's worth of data with variety for prototype
+    start_date = datetime(2024, 1, 1)
+    end_date = datetime.now()
+    current_date = start_date
+
+    # Base levels for each station to create variety (m bgl)
+    station_base_levels = {
+        1: 15, 2: 10, 3: 450, 4: 75, 5: 20, 6: 25, 7: 12, 8: 18, 9: 22, 10: 16, 11: 14, 12: 8, 13: 19, 14: 17,
+        15: 13, 16: 21, 17: 30, 18: 35, 19: 28, 20: 11, 21: 250
+    }
+
+    while current_date <= end_date:
+        for station_id in range(1, 22):
+            # Check if data already exists for this date
+            existing = cursor.execute('SELECT id FROM water_levels WHERE station_id = ? AND date = ?', (station_id, current_date.strftime('%Y-%m-%d'))).fetchone()
+            if existing:
+                continue
+
+            base_level = station_base_levels.get(station_id, 20)
+            month = current_date.month
+
+            # Seasonal factor: higher recharge in monsoon (June-Sep), lower in dry months
+            if month in [6, 7, 8, 9]:  # Monsoon
+                seasonal_factor = 0.9  # Lower levels due to recharge
+            elif month in [10, 11, 12, 1]:  # Post-monsoon to winter
+                seasonal_factor = 1.0
+            else:  # Summer (Feb-May)
+                seasonal_factor = 1.1  # Higher levels due to depletion
+
+            # Random fluctuation
+            fluctuation = random.uniform(-2, 2)
+
+            # Trend: slight decline over time for some stations
+            days_since_start = (current_date - start_date).days
+            trend_factor = 1 + (days_since_start / 365) * 0.05  # 5% increase per year (deeper)
+
+            level = base_level * seasonal_factor * trend_factor + fluctuation
+            level = max(1, level)  # Ensure positive
+
+            # Recharge pattern based on level thresholds (adjusted for variety)
+            if level < base_level * 0.5:
+                pattern = 'Critical'
+            elif level < base_level * 0.7:
+                pattern = 'Warning'
+            elif level < base_level * 0.9:
+                pattern = 'Low'
+            else:
+                pattern = 'Normal'
+
             cursor.execute('INSERT INTO water_levels (station_id, date, water_level, recharge_pattern) VALUES (?, ?, ?, ?)',
-                           (station_id, date, water_level, pattern))
+                           (station_id, current_date.strftime('%Y-%m-%d'), round(level, 2), pattern))
+
+        current_date += timedelta(days=30)  # Monthly data points for density
 
     # Generate initial predictions for each station
-    for station_id in range(1, 21):
+    for station_id in range(1, 22):
         district_row = cursor.execute('SELECT district FROM stations WHERE id = ?', (station_id,)).fetchone()
         if not district_row:
             continue
@@ -251,45 +335,108 @@ def init_db():
             cursor.execute('INSERT INTO predictions (station_id, date, predicted_level) VALUES (?, ?, ?)', 
                            (station_id, next_date.strftime('%Y-%m-%d'), predicted_level))
 
+    # Generate initial alerts for all stations using policymaker role
+    for station_id in range(1, 22):
+        # Get latest prediction
+        pred_row = cursor.execute('''
+            SELECT predicted_level FROM predictions WHERE station_id = ? ORDER BY date DESC LIMIT 1
+        ''', (station_id,)).fetchone()
+        if pred_row:
+            predicted_level = pred_row['predicted_level']
+            alert_level = get_alert_status(station_id, 'policymaker', predicted_level)
+            message = f"Initial alert for station {station_id}: Level {predicted_level:.2f}m bgl - {alert_level.upper()}"
+            timestamp = datetime.now().isoformat()
+            cursor.execute('''
+                INSERT OR IGNORE INTO alerts (station_id, alert_level, message, timestamp)
+                VALUES (?, ?, ?, ?)
+            ''', (station_id, alert_level, message, timestamp))
+
     conn.commit()
     conn.close()
 
 # API Endpoints
 
+def calculate_wtf(current_level, prev_level, time_delta_hours=1, sy=0.1):
+    """
+    Calculate Water Table Fluctuation (WTF) based recharge rate.
+    WTF = Specific Yield (Sy) * (current_level - prev_level) / time_delta
+    Positive: recharge (rising), Negative: depletion (falling).
+    Sy default 0.1 for unconfined aquifer.
+    """
+    if prev_level is None:
+        return 0.0
+    delta_level = current_level - prev_level
+    recharge_rate = sy * delta_level / time_delta_hours
+    return round(recharge_rate, 2)
+
+def calculate_recharge_wtf(station_id, sy=0.1):
+    """
+    Calculate recharge over the last 30 days: Recharge = Sy * Delta_h
+    Delta_h = latest_level - level_30_days_ago
+    Positive: net recharge, Negative: net depletion.
+    If less than 30 days data, use available period.
+    """
+    conn = get_db_connection()
+    thirty_days_ago = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+    levels = conn.execute('SELECT water_level FROM water_levels WHERE station_id = ? AND date >= ? ORDER BY date', (station_id, thirty_days_ago)).fetchall()
+    conn.close()
+
+    if len(levels) < 2:
+        return 0.0  # Not enough data
+
+    delta_h = levels[-1]['water_level'] - levels[0]['water_level']
+    recharge = sy * delta_h
+    return round(recharge, 2)
+
 def get_alert_status(station_id, role, predicted_level):
     """
     Get alert level based on role/station-specific thresholds from DB.
+    Updated logic: lower level is worse (deeper water table).
+    Normal: >=5m, Warning: 3-5m, Critical: 1-3m, Emergency: <1m
+    Now prioritizes live level over predicted if available within last hour.
+    Returns mapped levels: 'critical' (emergency), 'warning' (critical), 'info' (warning), 'success' (normal).
     """
     conn = get_db_connection()
+
+    # Check for latest live reading within last hour
+    one_hour_ago = (datetime.now() - timedelta(hours=1)).isoformat()
+    live_row = conn.execute('''
+        SELECT water_level FROM live_readings
+        WHERE station_id = ? AND timestamp > ?
+        ORDER BY timestamp DESC LIMIT 1
+    ''', (station_id, one_hour_ago)).fetchone()
+
+    level_to_check = live_row['water_level'] if live_row else predicted_level
+
     threshold_row = conn.execute('''
-        SELECT normal_max, warning_max, critical_max, emergency_min
+        SELECT normal_min, warning_min, critical_min, emergency_max
         FROM alert_thresholds
         WHERE (station_id = ? OR station_id IS NULL) AND role = ?
         ORDER BY CASE WHEN station_id = ? THEN 0 ELSE 1 END
         LIMIT 1
     ''', (station_id, role, station_id)).fetchone()
     conn.close()
-    
+
     if not threshold_row:
-        # Fallback to defaults
-        normal_max = 50
-        warning_max = 100
-        critical_max = 200
-        emergency_min = 200
+        # Fallback to defaults: Normal >=5, Warning >=3, Critical >=1, Emergency <1
+        normal_min = 5
+        warning_min = 3
+        critical_min = 1
+        emergency_max = 1
     else:
-        normal_max = threshold_row['normal_max']
-        warning_max = threshold_row['warning_max']
-        critical_max = threshold_row['critical_max']
-        emergency_min = threshold_row['emergency_min']
-    
-    if predicted_level <= normal_max:
-        return 'normal'
-    elif predicted_level <= warning_max:
-        return 'warning'
-    elif predicted_level <= critical_max:
-        return 'critical'
+        normal_min = threshold_row['normal_min']
+        warning_min = threshold_row['warning_min']
+        critical_min = threshold_row['critical_min']
+        emergency_max = threshold_row['emergency_max']
+
+    if level_to_check < emergency_max:
+        return 'critical'  # emergency -> critical
+    elif level_to_check < critical_min:
+        return 'warning'  # critical -> warning
+    elif level_to_check < warning_min:
+        return 'info'  # warning -> info
     else:
-        return 'emergency'
+        return 'success'  # normal -> success
 
 def get_recharge_pattern(station_id):
     """
@@ -659,6 +806,67 @@ def get_dashboard_data(role):
             FROM stations s
         ''').fetchall()
 
+        # Base projections for default station (Agra, id=20) with normal factors
+        default_station_id = 20
+        station_row = conn.execute('SELECT district, latitude, longitude FROM stations WHERE id = ?', (default_station_id,)).fetchone()
+        if station_row:
+            district = station_row['district'].lower()
+            lat = station_row['latitude']
+            lon = station_row['longitude']
+
+            # Fetch base precipitation
+            base_precip, _ = fetch_weather(lat, lon)
+            adjusted_precip = base_precip * 1.0  # Normal factor
+
+            # Get historical data
+            levels = conn.execute('SELECT date, water_level FROM water_levels WHERE station_id = ? ORDER BY date', (default_station_id,)).fetchall()
+
+            if len(levels) >= 3:
+                projections = []
+                if district in models:
+                    model = models[district]
+                    hist_df = pd.DataFrame([{'ds': pd.to_datetime(r['date']), 'y': r['water_level']} for r in levels])
+                    last_date = hist_df['ds'].max()
+
+                    # Create 30-day future dataframe
+                    future_dates = [last_date + pd.DateOffset(days=i) for i in range(1, 31)]
+                    future_df = pd.DataFrame({'ds': future_dates})
+                    future_df['precipitation_sum'] = adjusted_precip
+
+                    forecast = model.predict(future_df)
+
+                    for i, row in forecast.iterrows():
+                        projected_level = row['yhat'] * (2 - 1.0)  # Normal extraction factor 1.0
+                        projections.append({
+                            'date': row['ds'].strftime('%Y-%m-%d'),
+                            'projected_level': round(projected_level, 2)
+                        })
+                else:
+                    # Fallback to linear regression
+                    levels_desc = [r for r in levels][-12:]  # last 12
+                    data_points = [(pd.to_datetime(r['date']), r['water_level']) for r in levels_desc]
+                    data_points.sort(key=lambda x: x[0])
+                    X = np.array([(d[0] - data_points[0][0]).days for d in data_points]).reshape(-1, 1)
+                    y = np.array([d[1] for d in data_points])
+                    lr_model = LinearRegression()
+                    lr_model.fit(X, y)
+
+                    last_date = data_points[-1][0]
+                    for i in range(1, 31):
+                        future_date = last_date + pd.DateOffset(days=i)
+                        days_diff = (future_date - data_points[0][0]).days
+                        projected_level = lr_model.predict([[days_diff]])[0] * (2 - 1.0)  # Normal extraction
+                        projections.append({
+                            'date': future_date.strftime('%Y-%m-%d'),
+                            'projected_level': round(projected_level, 2)
+                        })
+
+                base_projections = projections
+            else:
+                base_projections = []
+        else:
+            base_projections = []
+
         regional_data = [dict(row) for row in regional_trends]
         alert_data = [dict(row) for row in alert_summary]
         stations_data = [dict(row) for row in stations_status]
@@ -669,7 +877,12 @@ def get_dashboard_data(role):
             "regionalTrends": regional_data,
             "rechargeForecast": recharge_forecast,
             "alertSummary": alert_data,
-            "stationsStatus": stations_data
+            "stationsStatus": stations_data,
+            "baseProjections": {
+                "station_id": default_station_id,
+                "projections": base_projections,
+                "adjusted_precip": round(adjusted_precip, 2) if 'adjusted_precip' in locals() else 0
+            }
         })
 
     elif role == 'planner':
@@ -825,7 +1038,7 @@ def predict_water_level(station_id):
         # Store prediction
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('INSERT OR REPLACE INTO predictions (station_id, date, predicted_level) VALUES (?, ?, ?)', 
+        cursor.execute('INSERT OR REPLACE INTO predictions (station_id, date, predicted_level) VALUES (?, ?, ?)',
                        (station_id, next_date.strftime('%Y-%m-%d'), predicted_level))
         conn.commit()
         conn.close()
@@ -848,23 +1061,38 @@ def get_station_trends(station_id):
     conn = get_db_connection()
     trends = conn.execute('''
         SELECT date, water_level FROM water_levels
-        WHERE station_id = ?
-        ORDER BY date DESC
-        LIMIT 30
+        WHERE station_id = ? AND date >= datetime('now', '-30 days')
+        ORDER BY date ASC
     ''', (station_id,)).fetchall()
-    predictions = conn.execute('SELECT date, predicted_level FROM predictions WHERE station_id = ? ORDER BY date', (station_id,)).fetchall()
+    predictions = conn.execute('SELECT date, predicted_level FROM predictions WHERE station_id = ? ORDER BY date ASC', (station_id,)).fetchall()
+
+    # Fetch live readings for last 24 hours
+    from datetime import datetime, timedelta
+    twenty_four_hours_ago = (datetime.now() - timedelta(hours=24)).isoformat()
+    live_trends = conn.execute('''
+        SELECT timestamp as date, water_level, recharge_rate as recharge_estimation, battery
+        FROM live_readings
+        WHERE station_id = ? AND timestamp > ?
+        ORDER BY timestamp ASC
+    ''', (station_id, twenty_four_hours_ago)).fetchall()
+
     conn.close()
 
-    if not trends:
+    if not trends and not live_trends:
         return jsonify({'error': 'Station not found or no data'}), 404
 
-    # Reverse to chronological order
-    trends = trends[::-1]
     result = []
     prev_level = None
+    prev_date = None
     for trend in trends:
         current_level = trend['water_level']
-        recharge_estimation = (current_level - prev_level) if prev_level is not None else 0.0
+        current_date = pd.to_datetime(trend['date'])
+        if prev_level is not None and prev_date is not None:
+            time_delta_days = (current_date - prev_date).days
+            time_delta_hours = time_delta_days * 24
+            recharge_estimation = calculate_wtf(current_level, prev_level, time_delta_hours)
+        else:
+            recharge_estimation = 0.0
         result.append({
             'date': trend['date'],
             'water_level': current_level,
@@ -872,6 +1100,17 @@ def get_station_trends(station_id):
             'type': 'historical'
         })
         prev_level = current_level
+        prev_date = current_date
+
+    # Add live readings
+    for live in live_trends:
+        result.append({
+            'date': live['date'],
+            'water_level': live['water_level'],
+            'recharge_estimation': round(live['recharge_estimation'], 2),
+            'battery': live['battery'],
+            'type': 'live'
+        })
 
     # Add predictions
     for pred in predictions:
@@ -882,8 +1121,8 @@ def get_station_trends(station_id):
             'type': 'predicted'
         })
 
-    # Sort by date
-    result.sort(key=lambda x: x['date'])
+    # Sort by date using proper datetime parsing
+    result.sort(key=lambda x: pd.to_datetime(x['date']))
 
     return jsonify({'station_id': station_id, 'trends': result})
 
@@ -952,43 +1191,92 @@ def get_reports_summary():
 @app.route('/alerts', methods=['GET'])
 def get_alerts():
     """
-    Returns list of stations with their alert status and latest water level.
-    Supports filtering by alert status via query param 'status'.
+    Returns list of active alerts from the alerts table with station names via JOIN.
+    Supports filtering by alert_level via query param 'level'.
+    Generates new alerts if fewer than 10 exist.
+    Maps alert levels: emergency->critical, critical->warning, warning->info.
     """
-    status_filter = request.args.get('status')
+    level_filter = request.args.get('level')
     role = request.args.get('role', 'policymaker')
 
     conn = get_db_connection()
-    stations = conn.execute('SELECT id FROM stations').fetchall()
+    alerts = conn.execute('''
+        SELECT a.*, s.name as station_name FROM alerts a
+        JOIN stations s ON a.station_id = s.id
+        WHERE a.resolved = 0 ORDER BY a.timestamp DESC
+    ''').fetchall()
+
+    # If fewer than 10 alerts, generate more
+    if len(alerts) < 10:
+        stations = conn.execute('SELECT id FROM stations').fetchall()
+        for station in stations:
+            station_id = station['id']
+            # Check if alert already exists for this station
+            existing = conn.execute('SELECT id FROM alerts WHERE station_id = ? AND resolved = 0', (station_id,)).fetchone()
+            if existing:
+                continue
+
+            pred_resp = predict_water_level(station_id)
+            if pred_resp.status_code != 200:
+                continue
+            predicted_level = pred_resp.get_json()['predicted_level']
+            alert_level = get_alert_status(station_id, role, predicted_level)
+
+            if alert_level in ['warning', 'critical', 'emergency']:
+                station_row = conn.execute('SELECT name FROM stations WHERE id = ?', (station_id,)).fetchone()
+                station_name = station_row['name'] if station_row else f'Station {station_id}'
+                messages = {
+                    'warning': f'Warning: Low water level at {station_name} ({predicted_level:.2f}m bgl)',
+                    'critical': f'Critical: Very low water level at {station_name} ({predicted_level:.2f}m bgl)',
+                    'emergency': f'Emergency: Severe depletion at {station_name} ({predicted_level:.2f}m bgl)'
+                }
+                message = messages.get(alert_level, f'Alert at {station_name}')
+                timestamp = datetime.now().isoformat()
+                conn.execute('INSERT INTO alerts (station_id, alert_level, message, timestamp) VALUES (?, ?, ?, ?)',
+                           (station_id, alert_level, message, timestamp))
+        conn.commit()
+        alerts = conn.execute('''
+            SELECT a.*, s.name as station_name FROM alerts a
+            JOIN stations s ON a.station_id = s.id
+            WHERE a.resolved = 0 ORDER BY a.timestamp DESC
+        ''').fetchall()
+
+    # Map alert levels for UI: emergency->critical, critical->warning, warning->info
+    level_mapping = {'emergency': 'critical', 'critical': 'warning', 'warning': 'info'}
 
     result = []
-    for station in stations:
-        station_id = station['id']
-
-        latest_level_row = conn.execute('''
-            SELECT water_level FROM water_levels WHERE station_id = ? ORDER BY date DESC LIMIT 1
-        ''', (station_id,)).fetchone()
-        latest_level = latest_level_row['water_level'] if latest_level_row else None
-
-        pred_resp = predict_water_level(station_id)
-        if pred_resp.status_code == 200:
-            predicted_level = pred_resp.get_json().get('predicted_level', None)
-        else:
-            predicted_level = None
-
-        alert = get_alert_status(station_id, role, predicted_level) if predicted_level is not None else 'unknown'
-
-        if status_filter and alert != status_filter:
+    for alert in alerts:
+        mapped_level = level_mapping.get(alert['alert_level'], alert['alert_level'])
+        if level_filter and mapped_level != level_filter:
             continue
-
         result.append({
-            "station_id": station_id,
-            "alert": alert,
-            "latest_level": latest_level
+            "id": alert['id'],
+            "station_id": alert['station_id'],
+            "type": mapped_level,
+            "title": f"{mapped_level.capitalize()} Alert",
+            "message": alert['message'],
+            "time": alert['timestamp'],
+            "station_name": alert['station_name']
         })
 
     conn.close()
     return jsonify(result)
+
+@app.route('/alerts/<int:id>/resolve', methods=['POST'])
+def resolve_alert(id):
+    """
+    Mark an alert as resolved by setting resolved=1 in the database.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE alerts SET resolved = 1 WHERE id = ? AND resolved = 0', (id,))
+    if cursor.rowcount > 0:
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': 'Alert resolved'})
+    else:
+        conn.close()
+        return jsonify({'error': 'Alert not found or already resolved'}), 404
 
 @app.route('/predictions', methods=['GET'])
 def get_predictions():
@@ -1001,9 +1289,245 @@ def get_predictions():
     result = [dict(pred) for pred in predictions]
     return jsonify(result)
 
+@app.route('/stations/live', methods=['GET'])
+def get_live_stations():
+    """
+    Returns latest live readings for stations with telemetry data.
+    Includes station_id, name, latitude, longitude, current_level, last_updated.
+    """
+    conn = get_db_connection()
+    # Get the latest reading per station
+    latest_readings = conn.execute('''
+        SELECT lr.station_id, lr.water_level, lr.timestamp
+        FROM live_readings lr
+        WHERE lr.timestamp = (
+            SELECT MAX(lr2.timestamp)
+            FROM live_readings lr2
+            WHERE lr2.station_id = lr.station_id
+        )
+    ''').fetchall()
+    
+    result = []
+    for reading in latest_readings:
+        station = conn.execute('''
+            SELECT id, name, latitude, longitude
+            FROM stations
+            WHERE id = ?
+        ''', (reading['station_id'],)).fetchone()
+        
+        if station:
+            result.append({
+                'station_id': station['id'],
+                'name': station['name'],
+                'latitude': station['latitude'],
+                'longitude': station['longitude'],
+                'current_level': reading['water_level'],
+                'last_updated': reading['timestamp']
+            })
+    
+    conn.close()
+    return jsonify(result)
+
+@app.route('/station/<int:station_id>/live', methods=['GET'])
+def get_station_live_readings(station_id):
+    """
+    Returns last 24 hours of live readings for the station.
+    """
+    from datetime import datetime, timedelta
+    twenty_four_hours_ago = (datetime.now() - timedelta(hours=24)).isoformat()
+    
+    conn = get_db_connection()
+    readings = conn.execute('''
+        SELECT id, station_id, timestamp, water_level, recharge_rate, battery, status
+        FROM live_readings
+        WHERE station_id = ? AND timestamp > ?
+        ORDER BY timestamp DESC
+    ''', (station_id, twenty_four_hours_ago)).fetchall()
+    
+    result = [dict(reading) for reading in readings]
+    conn.close()
+    return jsonify({'station_id': station_id, 'live_readings': result})
+
+@app.route('/station/<int:station_id>/sensors', methods=['GET'])
+def get_station_sensors(station_id):
+    """
+    Returns sensor data for a station (mock data).
+    """
+    # Mock sensor data
+    sensors = [
+        {
+            "id": 1,
+            "type": "piezometer",
+            "location": "Well head",
+            "status": "active",
+            "last_reading": 15.2,
+            "unit": "m bgl",
+            "timestamp": datetime.now().isoformat()
+        },
+        {
+            "id": 2,
+            "type": "weather_station",
+            "location": "Nearby",
+            "status": "active",
+            "last_reading": 28.5,
+            "unit": "°C",
+            "timestamp": datetime.now().isoformat()
+        },
+        {
+            "id": 3,
+            "type": "rain_gauge",
+            "location": "Station roof",
+            "status": "active",
+            "last_reading": 0.0,
+            "unit": "mm",
+            "timestamp": datetime.now().isoformat()
+        }
+    ]
+    return jsonify({"station_id": station_id, "sensors": sensors})
+
+@app.route('/users', methods=['GET'])
+def get_users():
+    """
+    Returns list of users (mock data).
+    """
+    users = [
+        {
+            "id": 1,
+            "name": "Rajesh Kumar",
+            "role": "farmer",
+            "email": "rajesh.farmer@example.com",
+            "phone": "+91-9876543210",
+            "location": "Delhi",
+            "stations": [1, 2]
+        },
+        {
+            "id": 2,
+            "name": "Priya Sharma",
+            "role": "policymaker",
+            "email": "priya.policy@example.com",
+            "phone": "+91-9876543211",
+            "location": "Mumbai",
+            "stations": [2, 7, 12]
+        },
+        {
+            "id": 3,
+            "name": "Amit Singh",
+            "role": "stakeholder",
+            "email": "amit.stakeholder@example.com",
+            "phone": "+91-9876543212",
+            "location": "Bengaluru",
+            "stations": [3, 17]
+        },
+        {
+            "id": 4,
+            "name": "Dr. Meera Patel",
+            "role": "researcher",
+            "email": "meera.researcher@example.com",
+            "phone": "+91-9876543213",
+            "location": "Chennai",
+            "stations": [4, 17, 18]
+        },
+        {
+            "id": 5,
+            "name": "Vikram Rao",
+            "role": "planner",
+            "email": "vikram.planner@example.com",
+            "phone": "+91-9876543214",
+            "location": "Hyderabad",
+            "stations": [6, 19, 20]
+        }
+    ]
+    return jsonify(users)
+
+@app.route('/scenario', methods=['POST'])
+def scenario_modeling():
+    """
+    Scenario modeling: Re-run Prophet with adjusted rainfall/extraction factors.
+    Returns 30-day projected water levels.
+    """
+    data = request.json
+    if not data or 'station_id' not in data or 'rainfall_factor' not in data or 'extraction_factor' not in data:
+        return jsonify({'error': 'Missing required fields: station_id, rainfall_factor, extraction_factor'}), 400
+
+    station_id = data['station_id']
+    rainfall_factor = float(data['rainfall_factor'])
+    extraction_factor = float(data['extraction_factor'])
+
+    # Validate factors (0.5 to 2.0)
+    if not (0.5 <= rainfall_factor <= 2.0) or not (0.5 <= extraction_factor <= 2.0):
+        return jsonify({'error': 'Factors must be between 0.5 and 2.0'}), 400
+
+    conn = get_db_connection()
+    station_row = conn.execute('SELECT district, latitude, longitude FROM stations WHERE id = ?', (station_id,)).fetchone()
+    conn.close()
+    if not station_row:
+        return jsonify({'error': 'Station not found'}), 404
+
+    district = station_row['district'].lower()
+    lat = station_row['latitude']
+    lon = station_row['longitude']
+
+    # Fetch base 7-day avg precipitation
+    base_precip, _ = fetch_weather(lat, lon)
+    adjusted_precip = base_precip * rainfall_factor
+
+    # Get historical data
+    conn = get_db_connection()
+    levels = conn.execute('SELECT date, water_level FROM water_levels WHERE station_id = ? ORDER BY date', (station_id,)).fetchall()
+    conn.close()
+
+    if len(levels) < 3:
+        return jsonify({'error': 'Not enough data for prediction'}), 400
+
+    projections = []
+    if district in models:
+        model = models[district]
+        hist_df = pd.DataFrame([{'ds': pd.to_datetime(r['date']), 'y': r['water_level']} for r in levels])
+        last_date = hist_df['ds'].max()
+
+        # Create 30-day future dataframe
+        future_dates = [last_date + pd.DateOffset(days=i) for i in range(1, 31)]
+        future_df = pd.DataFrame({'ds': future_dates})
+        future_df['precipitation_sum'] = adjusted_precip
+
+        forecast = model.predict(future_df)
+
+        for i, row in forecast.iterrows():
+            projected_level = row['yhat'] * (2 - extraction_factor)  # Higher extraction -> lower level
+            projections.append({
+                'date': row['ds'].strftime('%Y-%m-%d'),
+                'projected_level': round(projected_level, 2)
+            })
+    else:
+        # Fallback to linear regression
+        levels_desc = [r for r in levels][-12:]  # last 12
+        data_points = [(pd.to_datetime(r['date']), r['water_level']) for r in levels_desc]
+        data_points.sort(key=lambda x: x[0])
+        X = np.array([(d[0] - data_points[0][0]).days for d in data_points]).reshape(-1, 1)
+        y = np.array([d[1] for d in data_points])
+        lr_model = LinearRegression()
+        lr_model.fit(X, y)
+
+        last_date = data_points[-1][0]
+        for i in range(1, 31):
+            future_date = last_date + pd.DateOffset(days=i)
+            days_diff = (future_date - data_points[0][0]).days
+            projected_level = lr_model.predict([[days_diff]])[0] * (2 - extraction_factor)
+            projections.append({
+                'date': future_date.strftime('%Y-%m-%d'),
+                'projected_level': round(projected_level, 2)
+            })
+
+    return jsonify({
+        "station_id": station_id,
+        "projections": projections,
+        "adjusted_precip": round(adjusted_precip, 2)
+    })
+
 def update_predictions():
     """
     Scheduled job to update predictions for all stations every 15 minutes.
+    Also generates alerts based on updated predictions.
     """
     conn = get_db_connection()
     stations = conn.execute('SELECT id, district, latitude, longitude FROM stations').fetchall()
@@ -1039,7 +1563,7 @@ def update_predictions():
 
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute('INSERT OR REPLACE INTO predictions (station_id, date, predicted_level) VALUES (?, ?, ?)', 
+            cursor.execute('INSERT OR REPLACE INTO predictions (station_id, date, predicted_level) VALUES (?, ?, ?)',
                            (station_id, future_date.strftime('%Y-%m-%d'), predicted_level))
             conn.commit()
             conn.close()
@@ -1059,14 +1583,145 @@ def update_predictions():
             # Store prediction
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute('INSERT OR REPLACE INTO predictions (station_id, date, predicted_level) VALUES (?, ?, ?)', 
+            cursor.execute('INSERT OR REPLACE INTO predictions (station_id, date, predicted_level) VALUES (?, ?, ?)',
                            (station_id, next_date.strftime('%Y-%m-%d'), predicted_level))
             conn.commit()
             conn.close()
+
+        # Generate alert based on updated prediction
+        alert_level = get_alert_status(station_id, 'policymaker', predicted_level)
+        if alert_level in ['warning', 'critical', 'emergency']:
+            conn = get_db_connection()
+            # Check if alert already exists for this station
+            existing = conn.execute('SELECT id FROM alerts WHERE station_id = ? AND resolved = 0', (station_id,)).fetchone()
+            if not existing:
+                station_row = conn.execute('SELECT name FROM stations WHERE id = ?', (station_id,)).fetchone()
+                station_name = station_row['name'] if station_row else f'Station {station_id}'
+                messages = {
+                    'warning': f'Warning: Low water level at {station_name} ({predicted_level:.2f}m bgl)',
+                    'critical': f'Critical: Very low water level at {station_name} ({predicted_level:.2f}m bgl)',
+                    'emergency': f'Emergency: Severe depletion at {station_name} ({predicted_level:.2f}m bgl)'
+                }
+                message = messages.get(alert_level, f'Alert at {station_name}')
+                timestamp = datetime.now().isoformat()
+                conn.execute('INSERT INTO alerts (station_id, alert_level, message, timestamp) VALUES (?, ?, ?, ?)',
+                           (station_id, alert_level, message, timestamp))
+                conn.commit()
+            conn.close()
+
+def update_live_readings():
+    """
+    Scheduled job to update live_readings for all stations every 5 minutes.
+    Generates mock data with slight variations from latest water levels.
+    Uses WTF for recharge_rate: fetches prev_level from last live_reading or historical water_level.
+    time_delta_hours = 5/60 ≈ 0.0833.
+    """
+    conn = get_db_connection()
+    stations = conn.execute('SELECT id FROM stations').fetchall()
+    conn.close()
+
+    time_delta_hours = 5 / 60  # 5 minutes interval
+
+    for station in stations:
+        station_id = station['id']
+
+        # Get base_level from latest historical
+        conn = get_db_connection()
+        hist_row = conn.execute('SELECT water_level FROM water_levels WHERE station_id = ? ORDER BY date DESC LIMIT 1', (station_id,)).fetchone()
+
+        # Get last live_reading for prev_level and prev_timestamp
+        live_row = conn.execute('''
+            SELECT water_level, timestamp FROM live_readings
+            WHERE station_id = ? ORDER BY timestamp DESC LIMIT 1
+        ''', (station_id,)).fetchone()
+        conn.close()
+
+        if not hist_row:
+            continue
+
+        base_level = hist_row['water_level']
+        prev_level = live_row['water_level'] if live_row else base_level
+        prev_timestamp = live_row['timestamp'] if live_row else None
+
+        # If no prev_timestamp, assume 1h delta as fallback
+        actual_delta_hours = time_delta_hours if prev_timestamp else 1.0
+
+        # Generate current_level with ±0.5m variation
+        current_level = base_level + random.uniform(-0.5, 0.5)
+        recharge_rate = calculate_wtf(current_level, prev_level, actual_delta_hours)
+        battery = random.uniform(80, 100)
+        status = 'active'
+        timestamp = datetime.now().isoformat()
+
+        # Insert into live_readings
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO live_readings (station_id, timestamp, water_level, recharge_rate, battery, status) VALUES (?, ?, ?, ?, ?, ?)',
+                       (station_id, timestamp, current_level, recharge_rate, battery, status))
+        conn.commit()
+        conn.close()
+
+def fetch_and_store_live_telemetry():
+    """
+    Fetch live telemetry data from configured DWLR feeds and store in live_readings table.
+    Currently mock implementation - replace with real API calls when feeds are found.
+    Uses WTF for recharge_rate: fetches prev_level from last live_reading or historical water_level.
+    time_delta_hours = 1/60 ≈ 0.0167.
+    """
+    time_delta_hours = 1 / 60  # 1 minute interval
+
+    for station_id, feed_url in LIVE_STATION_FEEDS.items():
+        try:
+            # Mock telemetry data (replace with real API call)
+            # Example: response = requests.get(feed_url)
+            # data = response.json() if response.status_code == 200 else None
+
+            # Get base_level from latest historical
+            conn = get_db_connection()
+            hist_row = conn.execute('SELECT water_level FROM water_levels WHERE station_id = ? ORDER BY date DESC LIMIT 1', (station_id,)).fetchone()
+
+            # Get last live_reading for prev_level and prev_timestamp
+            live_row = conn.execute('''
+                SELECT water_level, timestamp FROM live_readings
+                WHERE station_id = ? ORDER BY timestamp DESC LIMIT 1
+            ''', (station_id,)).fetchone()
+            conn.close()
+
+            if not hist_row:
+                continue
+
+            base_level = hist_row['water_level']
+            prev_level = live_row['water_level'] if live_row else base_level
+            prev_timestamp = live_row['timestamp'] if live_row else None
+
+            # If no prev_timestamp, assume 1h delta as fallback
+            actual_delta_hours = time_delta_hours if prev_timestamp else 1.0
+
+            # Generate current_level with ±0.2m variation for telemetry
+            current_level = base_level + random.uniform(-0.2, 0.2)
+            recharge_rate = calculate_wtf(current_level, prev_level, actual_delta_hours)
+            battery = random.uniform(85, 100)  # Better battery for telemetry stations
+            status = 'active'
+            timestamp = datetime.now().isoformat()
+
+            # Store in live_readings
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO live_readings (station_id, timestamp, water_level, recharge_rate, battery, status) VALUES (?, ?, ?, ?, ?, ?)',
+                           (station_id, timestamp, current_level, recharge_rate, battery, status))
+            conn.commit()
+            conn.close()
+
+            print(f"Live telemetry stored for station {station_id}: {current_level:.2f}m bgl")
+
+        except Exception as e:
+            print(f"Error fetching live telemetry for station {station_id}: {str(e)}")
 
 if __name__ == '__main__':
     init_db()
     scheduler = BackgroundScheduler()
     scheduler.add_job(update_predictions, 'interval', minutes=15)
+    scheduler.add_job(update_live_readings, 'interval', minutes=5)
+    scheduler.add_job(fetch_and_store_live_telemetry, 'interval', minutes=1)
     scheduler.start()
     app.run(debug=True)

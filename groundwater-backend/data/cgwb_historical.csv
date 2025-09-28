@@ -1,0 +1,693 @@
+Date,District,State,Latitude,Longitude,Water_Level_m_bgl,Recharge_Pattern
+2023-01-01,Agra,Uttar Pradesh,27.1767,78.0081,55.0,Low
+2023-02-01,Agra,Uttar Pradesh,27.1767,78.0081,57.0,Low
+2023-03-01,Agra,Uttar Pradesh,27.1767,78.0081,59.0,Low
+2023-04-01,Agra,Uttar Pradesh,27.1767,78.0081,61.0,Low
+2023-05-01,Agra,Uttar Pradesh,27.1767,78.0081,63.0,Low
+2023-06-01,Agra,Uttar Pradesh,27.1767,78.0081,65.0,Low
+2023-07-01,Agra,Uttar Pradesh,27.1767,78.0081,67.0,Low
+2023-08-01,Agra,Uttar Pradesh,27.1767,78.0081,69.0,Low
+2023-09-01,Agra,Uttar Pradesh,27.1767,78.0081,71.0,Low
+2023-10-01,Agra,Uttar Pradesh,27.1767,78.0081,73.0,Low
+2023-11-01,Agra,Uttar Pradesh,27.1767,78.0081,75.0,Low
+2023-12-01,Agra,Uttar Pradesh,27.1767,78.0081,77.0,Low
+2024-01-01,Agra,Uttar Pradesh,27.1767,78.0081,79.0,Low
+2024-02-01,Agra,Uttar Pradesh,27.1767,78.0081,81.0,Low
+2024-03-01,Agra,Uttar Pradesh,27.1767,78.0081,83.0,Low
+2024-04-01,Agra,Uttar Pradesh,27.1767,78.0081,85.0,Low
+2024-05-01,Agra,Uttar Pradesh,27.1767,78.0081,87.0,Low
+2024-06-01,Agra,Uttar Pradesh,27.1767,78.0081,89.0,Low
+2024-07-01,Agra,Uttar Pradesh,27.1767,78.0081,91.0,Low
+2024-08-01,Agra,Uttar Pradesh,27.1767,78.0081,93.0,Low
+2024-09-01,Agra,Uttar Pradesh,27.1767,78.0081,95.0,Low
+2024-10-01,Agra,Uttar Pradesh,27.1767,78.0081,97.0,Low
+2024-11-01,Agra,Uttar Pradesh,27.1767,78.0081,99.0,Low
+2024-12-01,Agra,Uttar Pradesh,27.1767,78.0081,101.0,Warning
+2025-01-01,Agra,Uttar Pradesh,27.1767,78.0081,103.0,Warning
+2025-02-01,Agra,Uttar Pradesh,27.1767,78.0081,105.0,Warning
+2025-03-01,Agra,Uttar Pradesh,27.1767,78.0081,107.0,Warning
+2025-04-01,Agra,Uttar Pradesh,27.1767,78.0081,109.0,Warning
+2025-05-01,Agra,Uttar Pradesh,27.1767,78.0081,111.0,Warning
+2025-06-01,Agra,Uttar Pradesh,27.1767,78.0081,113.0,Warning
+2025-07-01,Agra,Uttar Pradesh,27.1767,78.0081,115.0,Warning
+2025-08-01,Agra,Uttar Pradesh,27.1767,78.0081,117.0,Warning
+2025-09-01,Agra,Uttar Pradesh,27.1767,78.0081,119.0,Warning
+2025-09-28,Agra,Uttar Pradesh,27.1767,78.0081,120.8,Warning
+2023-01-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,40.0,Warning
+2023-02-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,42.0,Warning
+2023-03-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,44.0,Warning
+2023-04-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,46.0,Warning
+2023-05-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,48.0,Warning
+2023-06-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,50.0,Warning
+2023-07-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,52.0,Warning
+2023-08-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,54.0,Warning
+2023-09-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,56.0,Warning
+2023-10-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,58.0,Warning
+2023-11-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,60.0,Warning
+2023-12-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,62.0,Warning
+2024-01-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,64.0,Warning
+2024-02-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,66.0,Warning
+2024-03-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,68.0,Warning
+2024-04-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,70.0,Warning
+2024-05-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,72.0,Warning
+2024-06-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,74.0,Warning
+2024-07-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,76.0,Warning
+2024-08-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,78.0,Warning
+2024-09-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,80.0,Warning
+2024-10-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,82.0,Warning
+2024-11-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,84.0,Warning
+2024-12-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,86.0,Warning
+2025-01-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,88.0,Warning
+2025-02-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,90.0,Warning
+2025-03-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,92.0,Warning
+2025-04-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,94.0,Warning
+2025-05-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,96.0,Warning
+2025-06-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,98.0,Warning
+2025-07-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,100.0,Warning
+2025-08-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,102.0,Warning
+2025-09-01 00:00:00,Ahmedabad,Gujarat,23.0225,72.5714,104.0,Warning
+2025-09-28,Ahmedabad,Gujarat,23.0225,72.5714,105.77,Warning
+2023-01-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,280.0,Low
+2023-02-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,285.0,Low
+2023-03-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,290.0,Low
+2023-04-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,295.0,Low
+2023-05-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,300.0,Critical
+2023-06-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,305.0,Critical
+2023-07-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,310.0,Critical
+2023-08-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,315.0,Critical
+2023-09-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,320.0,Critical
+2023-10-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,325.0,Critical
+2023-11-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,330.0,Critical
+2023-12-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,335.0,Critical
+2024-01-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,340.0,Low
+2024-02-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,345.0,Low
+2024-03-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,350.0,Low
+2024-04-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,355.0,Low
+2024-05-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,360.0,Critical
+2024-06-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,365.0,Critical
+2024-07-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,370.0,Critical
+2024-08-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,375.0,Critical
+2024-09-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,380.0,Critical
+2024-10-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,385.0,Critical
+2024-11-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,390.0,Critical
+2024-12-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,395.0,Critical
+2025-01-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,400.0,Low
+2025-02-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,405.0,Low
+2025-03-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,410.0,Low
+2025-04-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,415.0,Low
+2025-05-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,420.0,Critical
+2025-06-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,425.0,Critical
+2025-07-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,430.0,Critical
+2025-08-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,435.0,Critical
+2025-09-01 00:00:00,Bengaluru,Karnataka,12.9716,77.5946,440.0,Critical
+2025-09-28,Bengaluru,Karnataka,12.9716,77.5946,444.43,Critical
+2023-01-01,Bhopal,Madhya Pradesh,23.2599,77.4126,32.0,Normal
+2023-02-01,Bhopal,Madhya Pradesh,23.2599,77.4126,33.0,Normal
+2023-03-01,Bhopal,Madhya Pradesh,23.2599,77.4126,34.0,Normal
+2023-04-01,Bhopal,Madhya Pradesh,23.2599,77.4126,35.0,Normal
+2023-05-01,Bhopal,Madhya Pradesh,23.2599,77.4126,36.0,Normal
+2023-06-01,Bhopal,Madhya Pradesh,23.2599,77.4126,37.0,Normal
+2023-07-01,Bhopal,Madhya Pradesh,23.2599,77.4126,38.0,Normal
+2023-08-01,Bhopal,Madhya Pradesh,23.2599,77.4126,39.0,Normal
+2023-09-01,Bhopal,Madhya Pradesh,23.2599,77.4126,40.0,Normal
+2023-10-01,Bhopal,Madhya Pradesh,23.2599,77.4126,41.0,Normal
+2023-11-01,Bhopal,Madhya Pradesh,23.2599,77.4126,42.0,Normal
+2023-12-01,Bhopal,Madhya Pradesh,23.2599,77.4126,43.0,Normal
+2024-01-01,Bhopal,Madhya Pradesh,23.2599,77.4126,44.0,Normal
+2024-02-01,Bhopal,Madhya Pradesh,23.2599,77.4126,45.0,Normal
+2024-03-01,Bhopal,Madhya Pradesh,23.2599,77.4126,46.0,Normal
+2024-04-01,Bhopal,Madhya Pradesh,23.2599,77.4126,47.0,Normal
+2024-05-01,Bhopal,Madhya Pradesh,23.2599,77.4126,48.0,Normal
+2024-06-01,Bhopal,Madhya Pradesh,23.2599,77.4126,49.0,Normal
+2024-07-01,Bhopal,Madhya Pradesh,23.2599,77.4126,50.0,Normal
+2024-08-01,Bhopal,Madhya Pradesh,23.2599,77.4126,51.0,Low
+2024-09-01,Bhopal,Madhya Pradesh,23.2599,77.4126,52.0,Low
+2024-10-01,Bhopal,Madhya Pradesh,23.2599,77.4126,53.0,Low
+2024-11-01,Bhopal,Madhya Pradesh,23.2599,77.4126,54.0,Low
+2024-12-01,Bhopal,Madhya Pradesh,23.2599,77.4126,55.0,Low
+2025-01-01,Bhopal,Madhya Pradesh,23.2599,77.4126,56.0,Low
+2025-02-01,Bhopal,Madhya Pradesh,23.2599,77.4126,57.0,Low
+2025-03-01,Bhopal,Madhya Pradesh,23.2599,77.4126,58.0,Low
+2025-04-01,Bhopal,Madhya Pradesh,23.2599,77.4126,59.0,Low
+2025-05-01,Bhopal,Madhya Pradesh,23.2599,77.4126,60.0,Low
+2025-06-01,Bhopal,Madhya Pradesh,23.2599,77.4126,61.0,Low
+2025-07-01,Bhopal,Madhya Pradesh,23.2599,77.4126,62.0,Low
+2025-08-01,Bhopal,Madhya Pradesh,23.2599,77.4126,63.0,Low
+2025-09-01,Bhopal,Madhya Pradesh,23.2599,77.4126,64.0,Low
+2025-09-28,Bhopal,Madhya Pradesh,23.2599,77.4126,64.9,Normal
+2023-01-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,10.0,Normal
+2023-02-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,12.0,Normal
+2023-03-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,14.0,Normal
+2023-04-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,16.0,Normal
+2023-05-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,18.0,Normal
+2023-06-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,20.0,Normal
+2023-07-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,22.0,Normal
+2023-08-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,24.0,Normal
+2023-09-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,26.0,Normal
+2023-10-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,28.0,Normal
+2023-11-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,30.0,Normal
+2023-12-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,32.0,Normal
+2024-01-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,34.0,Normal
+2024-02-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,36.0,Normal
+2024-03-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,38.0,Normal
+2024-04-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,40.0,Normal
+2024-05-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,42.0,Normal
+2024-06-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,44.0,Normal
+2024-07-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,46.0,Normal
+2024-08-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,48.0,Normal
+2024-09-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,50.0,Normal
+2024-10-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,52.0,Normal
+2024-11-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,54.0,Normal
+2024-12-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,56.0,Normal
+2025-01-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,58.0,Normal
+2025-02-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,60.0,Normal
+2025-03-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,62.0,Normal
+2025-04-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,64.0,Normal
+2025-05-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,66.0,Normal
+2025-06-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,68.0,Normal
+2025-07-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,70.0,Normal
+2025-08-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,72.0,Normal
+2025-09-01 00:00:00,Chennai,Tamil Nadu,13.0827,80.2707,74.0,Normal
+2025-09-28,Chennai,Tamil Nadu,13.0827,80.2707,75.77,Normal
+2023-01-01,Coimbatore,Tamil Nadu,11.0168,76.9558,20.0,Normal
+2023-02-01,Coimbatore,Tamil Nadu,11.0168,76.9558,20.5,Normal
+2023-03-01,Coimbatore,Tamil Nadu,11.0168,76.9558,21.0,Normal
+2023-04-01,Coimbatore,Tamil Nadu,11.0168,76.9558,21.5,Normal
+2023-05-01,Coimbatore,Tamil Nadu,11.0168,76.9558,22.0,Normal
+2023-06-01,Coimbatore,Tamil Nadu,11.0168,76.9558,22.5,Normal
+2023-07-01,Coimbatore,Tamil Nadu,11.0168,76.9558,23.0,Normal
+2023-08-01,Coimbatore,Tamil Nadu,11.0168,76.9558,23.5,Normal
+2023-09-01,Coimbatore,Tamil Nadu,11.0168,76.9558,24.0,Normal
+2023-10-01,Coimbatore,Tamil Nadu,11.0168,76.9558,24.5,Normal
+2023-11-01,Coimbatore,Tamil Nadu,11.0168,76.9558,25.0,Normal
+2023-12-01,Coimbatore,Tamil Nadu,11.0168,76.9558,25.5,Normal
+2024-01-01,Coimbatore,Tamil Nadu,11.0168,76.9558,26.0,Normal
+2024-02-01,Coimbatore,Tamil Nadu,11.0168,76.9558,26.5,Normal
+2024-03-01,Coimbatore,Tamil Nadu,11.0168,76.9558,27.0,Normal
+2024-04-01,Coimbatore,Tamil Nadu,11.0168,76.9558,27.5,Normal
+2024-05-01,Coimbatore,Tamil Nadu,11.0168,76.9558,28.0,Normal
+2024-06-01,Coimbatore,Tamil Nadu,11.0168,76.9558,28.5,Normal
+2024-07-01,Coimbatore,Tamil Nadu,11.0168,76.9558,29.0,Normal
+2024-08-01,Coimbatore,Tamil Nadu,11.0168,76.9558,29.5,Normal
+2024-09-01,Coimbatore,Tamil Nadu,11.0168,76.9558,30.0,Normal
+2024-10-01,Coimbatore,Tamil Nadu,11.0168,76.9558,30.5,Normal
+2024-11-01,Coimbatore,Tamil Nadu,11.0168,76.9558,31.0,Normal
+2024-12-01,Coimbatore,Tamil Nadu,11.0168,76.9558,31.5,Normal
+2025-01-01,Coimbatore,Tamil Nadu,11.0168,76.9558,32.0,Normal
+2025-02-01,Coimbatore,Tamil Nadu,11.0168,76.9558,32.5,Normal
+2025-03-01,Coimbatore,Tamil Nadu,11.0168,76.9558,33.0,Normal
+2025-04-01,Coimbatore,Tamil Nadu,11.0168,76.9558,33.5,Normal
+2025-05-01,Coimbatore,Tamil Nadu,11.0168,76.9558,34.0,Normal
+2025-06-01,Coimbatore,Tamil Nadu,11.0168,76.9558,34.5,Normal
+2025-07-01,Coimbatore,Tamil Nadu,11.0168,76.9558,35.0,Normal
+2025-08-01,Coimbatore,Tamil Nadu,11.0168,76.9558,35.5,Normal
+2025-09-01,Coimbatore,Tamil Nadu,11.0168,76.9558,36.0,Normal
+2025-09-28,Coimbatore,Tamil Nadu,11.0168,76.9558,36.45,Normal
+2023-01-01 00:00:00,Delhi,Delhi,28.7041,77.1025,50.0,Warning
+2023-02-01 00:00:00,Delhi,Delhi,28.7041,77.1025,55.0,Warning
+2023-03-01 00:00:00,Delhi,Delhi,28.7041,77.1025,60.0,Warning
+2023-04-01 00:00:00,Delhi,Delhi,28.7041,77.1025,65.0,Warning
+2023-05-01 00:00:00,Delhi,Delhi,28.7041,77.1025,70.0,Warning
+2023-06-01 00:00:00,Delhi,Delhi,28.7041,77.1025,75.0,Warning
+2023-07-01 00:00:00,Delhi,Delhi,28.7041,77.1025,80.0,Warning
+2023-08-01 00:00:00,Delhi,Delhi,28.7041,77.1025,85.0,Warning
+2023-09-01 00:00:00,Delhi,Delhi,28.7041,77.1025,90.0,Warning
+2023-10-01 00:00:00,Delhi,Delhi,28.7041,77.1025,95.0,Warning
+2023-11-01 00:00:00,Delhi,Delhi,28.7041,77.1025,100.0,Warning
+2023-12-01 00:00:00,Delhi,Delhi,28.7041,77.1025,105.0,Warning
+2024-01-01 00:00:00,Delhi,Delhi,28.7041,77.1025,110.0,Warning
+2024-02-01 00:00:00,Delhi,Delhi,28.7041,77.1025,115.0,Warning
+2024-03-01 00:00:00,Delhi,Delhi,28.7041,77.1025,120.0,Warning
+2024-04-01 00:00:00,Delhi,Delhi,28.7041,77.1025,125.0,Warning
+2024-05-01 00:00:00,Delhi,Delhi,28.7041,77.1025,130.0,Warning
+2024-06-01 00:00:00,Delhi,Delhi,28.7041,77.1025,135.0,Warning
+2024-07-01 00:00:00,Delhi,Delhi,28.7041,77.1025,140.0,Warning
+2024-08-01 00:00:00,Delhi,Delhi,28.7041,77.1025,145.0,Warning
+2024-09-01 00:00:00,Delhi,Delhi,28.7041,77.1025,150.0,Warning
+2024-10-01 00:00:00,Delhi,Delhi,28.7041,77.1025,155.0,Warning
+2024-11-01 00:00:00,Delhi,Delhi,28.7041,77.1025,160.0,Warning
+2024-12-01 00:00:00,Delhi,Delhi,28.7041,77.1025,165.0,Warning
+2025-01-01 00:00:00,Delhi,Delhi,28.7041,77.1025,170.0,Warning
+2025-02-01 00:00:00,Delhi,Delhi,28.7041,77.1025,175.0,Warning
+2025-03-01 00:00:00,Delhi,Delhi,28.7041,77.1025,180.0,Warning
+2025-04-01 00:00:00,Delhi,Delhi,28.7041,77.1025,185.0,Warning
+2025-05-01 00:00:00,Delhi,Delhi,28.7041,77.1025,190.0,Warning
+2025-06-01 00:00:00,Delhi,Delhi,28.7041,77.1025,195.0,Warning
+2025-07-01 00:00:00,Delhi,Delhi,28.7041,77.1025,200.0,Warning
+2025-08-01 00:00:00,Delhi,Delhi,28.7041,77.1025,205.0,Warning
+2025-09-01 00:00:00,Delhi,Delhi,28.7041,77.1025,210.0,Warning
+2025-09-28,Delhi,Delhi,28.7041,77.1025,214.43,Warning
+2023-01-01,Ernakulam,Kerala,9.9312,76.2673,5.0,Normal
+2023-02-01,Ernakulam,Kerala,9.9312,76.2673,5.3,Normal
+2023-03-01,Ernakulam,Kerala,9.9312,76.2673,5.6,Normal
+2023-04-01,Ernakulam,Kerala,9.9312,76.2673,5.9,Normal
+2023-05-01,Ernakulam,Kerala,9.9312,76.2673,6.2,Normal
+2023-06-01,Ernakulam,Kerala,9.9312,76.2673,6.5,Normal
+2023-07-01,Ernakulam,Kerala,9.9312,76.2673,6.8,Normal
+2023-08-01,Ernakulam,Kerala,9.9312,76.2673,7.1,Normal
+2023-09-01,Ernakulam,Kerala,9.9312,76.2673,7.4,Normal
+2023-10-01,Ernakulam,Kerala,9.9312,76.2673,7.7,Normal
+2023-11-01,Ernakulam,Kerala,9.9312,76.2673,8.0,Normal
+2023-12-01,Ernakulam,Kerala,9.9312,76.2673,8.3,Normal
+2024-01-01,Ernakulam,Kerala,9.9312,76.2673,8.6,Normal
+2024-02-01,Ernakulam,Kerala,9.9312,76.2673,8.9,Normal
+2024-03-01,Ernakulam,Kerala,9.9312,76.2673,9.2,Normal
+2024-04-01,Ernakulam,Kerala,9.9312,76.2673,9.5,Normal
+2024-05-01,Ernakulam,Kerala,9.9312,76.2673,9.8,Normal
+2024-06-01,Ernakulam,Kerala,9.9312,76.2673,10.1,Normal
+2024-07-01,Ernakulam,Kerala,9.9312,76.2673,10.4,Normal
+2024-08-01,Ernakulam,Kerala,9.9312,76.2673,10.7,Normal
+2024-09-01,Ernakulam,Kerala,9.9312,76.2673,11.0,Normal
+2024-10-01,Ernakulam,Kerala,9.9312,76.2673,11.3,Normal
+2024-11-01,Ernakulam,Kerala,9.9312,76.2673,11.6,Normal
+2024-12-01,Ernakulam,Kerala,9.9312,76.2673,11.9,Normal
+2025-01-01,Ernakulam,Kerala,9.9312,76.2673,12.2,Normal
+2025-02-01,Ernakulam,Kerala,9.9312,76.2673,12.5,Normal
+2025-03-01,Ernakulam,Kerala,9.9312,76.2673,12.8,Normal
+2025-04-01,Ernakulam,Kerala,9.9312,76.2673,13.1,Normal
+2025-05-01,Ernakulam,Kerala,9.9312,76.2673,13.4,Normal
+2025-06-01,Ernakulam,Kerala,9.9312,76.2673,13.7,Normal
+2025-07-01,Ernakulam,Kerala,9.9312,76.2673,14.0,Normal
+2025-08-01,Ernakulam,Kerala,9.9312,76.2673,14.3,Normal
+2025-09-01,Ernakulam,Kerala,9.9312,76.2673,14.6,Normal
+2025-09-28,Ernakulam,Kerala,9.9312,76.2673,14.87,Normal
+2023-01-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,20.0,Normal
+2023-02-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,21.0,Normal
+2023-03-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,22.0,Normal
+2023-04-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,23.0,Normal
+2023-05-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,24.0,Normal
+2023-06-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,25.0,Normal
+2023-07-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,26.0,Normal
+2023-08-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,27.0,Normal
+2023-09-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,28.0,Normal
+2023-10-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,29.0,Normal
+2023-11-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,30.0,Normal
+2023-12-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,31.0,Normal
+2024-01-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,32.0,Normal
+2024-02-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,33.0,Normal
+2024-03-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,34.0,Normal
+2024-04-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,35.0,Normal
+2024-05-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,36.0,Normal
+2024-06-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,37.0,Normal
+2024-07-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,38.0,Normal
+2024-08-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,39.0,Normal
+2024-09-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,40.0,Normal
+2024-10-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,41.0,Normal
+2024-11-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,42.0,Normal
+2024-12-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,43.0,Normal
+2025-01-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,44.0,Normal
+2025-02-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,45.0,Normal
+2025-03-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,46.0,Normal
+2025-04-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,47.0,Normal
+2025-05-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,48.0,Normal
+2025-06-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,49.0,Normal
+2025-07-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,50.0,Normal
+2025-08-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,51.0,Normal
+2025-09-01 00:00:00,Hyderabad,Telangana,17.385,78.4867,52.0,Normal
+2025-09-28,Hyderabad,Telangana,17.385,78.4867,52.89,Normal
+2023-01-01,Indore,Madhya Pradesh,22.7196,75.8577,35.0,Warning
+2023-02-01,Indore,Madhya Pradesh,22.7196,75.8577,36.2,Warning
+2023-03-01,Indore,Madhya Pradesh,22.7196,75.8577,37.4,Warning
+2023-04-01,Indore,Madhya Pradesh,22.7196,75.8577,38.6,Warning
+2023-05-01,Indore,Madhya Pradesh,22.7196,75.8577,39.8,Warning
+2023-06-01,Indore,Madhya Pradesh,22.7196,75.8577,41.0,Warning
+2023-07-01,Indore,Madhya Pradesh,22.7196,75.8577,42.2,Warning
+2023-08-01,Indore,Madhya Pradesh,22.7196,75.8577,43.4,Warning
+2023-09-01,Indore,Madhya Pradesh,22.7196,75.8577,44.6,Warning
+2023-10-01,Indore,Madhya Pradesh,22.7196,75.8577,45.8,Warning
+2023-11-01,Indore,Madhya Pradesh,22.7196,75.8577,47.0,Warning
+2023-12-01,Indore,Madhya Pradesh,22.7196,75.8577,48.2,Warning
+2024-01-01,Indore,Madhya Pradesh,22.7196,75.8577,49.4,Warning
+2024-02-01,Indore,Madhya Pradesh,22.7196,75.8577,50.6,Low
+2024-03-01,Indore,Madhya Pradesh,22.7196,75.8577,51.8,Low
+2024-04-01,Indore,Madhya Pradesh,22.7196,75.8577,53.0,Low
+2024-05-01,Indore,Madhya Pradesh,22.7196,75.8577,54.2,Low
+2024-06-01,Indore,Madhya Pradesh,22.7196,75.8577,55.4,Low
+2024-07-01,Indore,Madhya Pradesh,22.7196,75.8577,56.6,Low
+2024-08-01,Indore,Madhya Pradesh,22.7196,75.8577,57.8,Low
+2024-09-01,Indore,Madhya Pradesh,22.7196,75.8577,59.0,Low
+2024-10-01,Indore,Madhya Pradesh,22.7196,75.8577,60.2,Low
+2024-11-01,Indore,Madhya Pradesh,22.7196,75.8577,61.4,Low
+2024-12-01,Indore,Madhya Pradesh,22.7196,75.8577,62.6,Low
+2025-01-01,Indore,Madhya Pradesh,22.7196,75.8577,63.8,Low
+2025-02-01,Indore,Madhya Pradesh,22.7196,75.8577,65.0,Low
+2025-03-01,Indore,Madhya Pradesh,22.7196,75.8577,66.2,Low
+2025-04-01,Indore,Madhya Pradesh,22.7196,75.8577,67.4,Low
+2025-05-01,Indore,Madhya Pradesh,22.7196,75.8577,68.6,Low
+2025-06-01,Indore,Madhya Pradesh,22.7196,75.8577,69.8,Low
+2025-07-01,Indore,Madhya Pradesh,22.7196,75.8577,71.0,Low
+2025-08-01,Indore,Madhya Pradesh,22.7196,75.8577,72.2,Low
+2025-09-01,Indore,Madhya Pradesh,22.7196,75.8577,73.4,Low
+2025-09-28,Indore,Madhya Pradesh,22.7196,75.8577,74.48,Warning
+2023-01-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,30.0,Normal
+2023-02-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,31.0,Normal
+2023-03-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,32.0,Normal
+2023-04-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,33.0,Normal
+2023-05-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,34.0,Normal
+2023-06-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,35.0,Normal
+2023-07-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,36.0,Normal
+2023-08-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,37.0,Normal
+2023-09-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,38.0,Normal
+2023-10-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,39.0,Normal
+2023-11-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,40.0,Normal
+2023-12-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,41.0,Normal
+2024-01-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,42.0,Normal
+2024-02-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,43.0,Normal
+2024-03-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,44.0,Normal
+2024-04-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,45.0,Normal
+2024-05-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,46.0,Normal
+2024-06-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,47.0,Normal
+2024-07-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,48.0,Normal
+2024-08-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,49.0,Normal
+2024-09-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,50.0,Normal
+2024-10-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,51.0,Normal
+2024-11-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,52.0,Normal
+2024-12-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,53.0,Normal
+2025-01-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,54.0,Normal
+2025-02-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,55.0,Normal
+2025-03-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,56.0,Normal
+2025-04-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,57.0,Normal
+2025-05-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,58.0,Normal
+2025-06-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,59.0,Normal
+2025-07-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,60.0,Normal
+2025-08-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,61.0,Normal
+2025-09-01 00:00:00,Jaipur,Rajasthan,26.9124,75.7873,62.0,Normal
+2025-09-28,Jaipur,Rajasthan,26.9124,75.7873,62.89,Normal
+2023-01-01,Kanpur,Uttar Pradesh,26.4499,80.3319,40.0,Warning
+2023-02-01,Kanpur,Uttar Pradesh,26.4499,80.3319,41.5,Warning
+2023-03-01,Kanpur,Uttar Pradesh,26.4499,80.3319,43.0,Warning
+2023-04-01,Kanpur,Uttar Pradesh,26.4499,80.3319,44.5,Warning
+2023-05-01,Kanpur,Uttar Pradesh,26.4499,80.3319,46.0,Warning
+2023-06-01,Kanpur,Uttar Pradesh,26.4499,80.3319,47.5,Warning
+2023-07-01,Kanpur,Uttar Pradesh,26.4499,80.3319,49.0,Warning
+2023-08-01,Kanpur,Uttar Pradesh,26.4499,80.3319,50.5,Low
+2023-09-01,Kanpur,Uttar Pradesh,26.4499,80.3319,52.0,Low
+2023-10-01,Kanpur,Uttar Pradesh,26.4499,80.3319,53.5,Low
+2023-11-01,Kanpur,Uttar Pradesh,26.4499,80.3319,55.0,Low
+2023-12-01,Kanpur,Uttar Pradesh,26.4499,80.3319,56.5,Low
+2024-01-01,Kanpur,Uttar Pradesh,26.4499,80.3319,58.0,Low
+2024-02-01,Kanpur,Uttar Pradesh,26.4499,80.3319,59.5,Low
+2024-03-01,Kanpur,Uttar Pradesh,26.4499,80.3319,61.0,Low
+2024-04-01,Kanpur,Uttar Pradesh,26.4499,80.3319,62.5,Low
+2024-05-01,Kanpur,Uttar Pradesh,26.4499,80.3319,64.0,Low
+2024-06-01,Kanpur,Uttar Pradesh,26.4499,80.3319,65.5,Low
+2024-07-01,Kanpur,Uttar Pradesh,26.4499,80.3319,67.0,Low
+2024-08-01,Kanpur,Uttar Pradesh,26.4499,80.3319,68.5,Low
+2024-09-01,Kanpur,Uttar Pradesh,26.4499,80.3319,70.0,Low
+2024-10-01,Kanpur,Uttar Pradesh,26.4499,80.3319,71.5,Low
+2024-11-01,Kanpur,Uttar Pradesh,26.4499,80.3319,73.0,Low
+2024-12-01,Kanpur,Uttar Pradesh,26.4499,80.3319,74.5,Low
+2025-01-01,Kanpur,Uttar Pradesh,26.4499,80.3319,76.0,Low
+2025-02-01,Kanpur,Uttar Pradesh,26.4499,80.3319,77.5,Low
+2025-03-01,Kanpur,Uttar Pradesh,26.4499,80.3319,79.0,Low
+2025-04-01,Kanpur,Uttar Pradesh,26.4499,80.3319,80.5,Low
+2025-05-01,Kanpur,Uttar Pradesh,26.4499,80.3319,82.0,Low
+2025-06-01,Kanpur,Uttar Pradesh,26.4499,80.3319,83.5,Low
+2025-07-01,Kanpur,Uttar Pradesh,26.4499,80.3319,85.0,Low
+2025-08-01,Kanpur,Uttar Pradesh,26.4499,80.3319,86.5,Low
+2025-09-01,Kanpur,Uttar Pradesh,26.4499,80.3319,88.0,Low
+2025-09-28,Kanpur,Uttar Pradesh,26.4499,80.3319,89.35,Warning
+2023-01-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,8.0,Critical
+2023-02-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,10.0,Critical
+2023-03-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,12.0,Critical
+2023-04-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,14.0,Critical
+2023-05-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,16.0,Critical
+2023-06-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,18.0,Critical
+2023-07-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,20.0,Critical
+2023-08-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,22.0,Critical
+2023-09-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,24.0,Critical
+2023-10-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,26.0,Critical
+2023-11-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,28.0,Critical
+2023-12-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,30.0,Critical
+2024-01-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,32.0,Critical
+2024-02-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,34.0,Critical
+2024-03-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,36.0,Critical
+2024-04-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,38.0,Critical
+2024-05-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,40.0,Critical
+2024-06-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,42.0,Critical
+2024-07-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,44.0,Critical
+2024-08-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,46.0,Critical
+2024-09-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,48.0,Critical
+2024-10-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,50.0,Critical
+2024-11-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,52.0,Critical
+2024-12-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,54.0,Critical
+2025-01-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,56.0,Critical
+2025-02-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,58.0,Critical
+2025-03-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,60.0,Critical
+2025-04-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,62.0,Critical
+2025-05-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,64.0,Critical
+2025-06-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,66.0,Critical
+2025-07-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,68.0,Critical
+2025-08-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,70.0,Critical
+2025-09-01 00:00:00,Kolkata,West Bengal,22.5726,88.3639,72.0,Critical
+2025-09-28,Kolkata,West Bengal,22.5726,88.3639,73.77,Critical
+2023-01-01 00:00:00,Lucknow,Uttar Pradesh,26.8467,80.9462,35.0,Warning
+2023-02-01 00:00:00,Lucknow,Uttar Pradesh,26.8467,80.9462,36.0,Warning
+2023-03-01 00:00:00,Lucknow,Uttar Pradesh,26.8467,80.9462,37.0,Warning
+2023-04-01 00:00:00,Lucknow,Uttar Pradesh,26.8467,80.9462,38.0,Warning
+2023-05-01 00:00:00,Lucknow,Uttar Pradesh,26.8467,80.9462,39.0,Warning
+2023-06-01 00:00:00,Lucknow,Uttar Pradesh,26.8467,80.9462,40.0,Warning
+2023-07-01 00:00:00,Lucknow,Uttar Pradesh,26.8467,80.9462,41.0,Warning
+2023-08-01 00:00:00,Lucknow,Uttar Pradesh,26.8467,80.9462,42.0,Warning
+2023-09-01 00:00:00,Lucknow,Uttar Pradesh,26.8467,80.9462,43.0,Warning
+2023-10-01 00:00:00,Lucknow,Uttar Pradesh,26.8467,80.9462,44.0,Warning
+2023-11-01 00:00:00,Lucknow,Uttar Pradesh,26.0,,,
+2025-09-28,Lucknow,Uttar Pradesh,26.8467,80.9462,,
+2023-01-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,15.0,Normal
+2023-02-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,16.0,Normal
+2023-03-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,17.0,Normal
+2023-04-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,18.0,Normal
+2023-05-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,19.0,Normal
+2023-06-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,20.0,Normal
+2023-07-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,21.0,Normal
+2023-08-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,22.0,Normal
+2023-09-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,23.0,Normal
+2023-10-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,24.0,Normal
+2023-11-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,25.0,Normal
+2023-12-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,26.0,Normal
+2024-01-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,27.0,Normal
+2024-02-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,28.0,Normal
+2024-03-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,29.0,Normal
+2024-04-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,30.0,Normal
+2024-05-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,31.0,Normal
+2024-06-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,32.0,Normal
+2024-07-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,33.0,Normal
+2024-08-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,34.0,Normal
+2024-09-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,35.0,Normal
+2024-10-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,36.0,Normal
+2024-11-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,37.0,Normal
+2024-12-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,38.0,Normal
+2025-01-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,39.0,Normal
+2025-02-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,40.0,Normal
+2025-03-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,41.0,Normal
+2025-04-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,42.0,Normal
+2025-05-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,43.0,Normal
+2025-06-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,44.0,Normal
+2025-07-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,45.0,Normal
+2025-08-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,46.0,Normal
+2025-09-01 00:00:00,Mumbai,Maharashtra,19.076,72.8777,47.0,Normal
+2025-09-28,Mumbai,Maharashtra,19.076,72.8777,47.89,Normal
+2023-01-01,Mysore,Karnataka,12.2958,76.6394,250.0,Critical
+2023-02-01,Mysore,Karnataka,12.2958,76.6394,255.0,Critical
+2023-03-01,Mysore,Karnataka,12.2958,76.6394,260.0,Critical
+2023-04-01,Mysore,Karnataka,12.2958,76.6394,265.0,Critical
+2023-05-01,Mysore,Karnataka,12.2958,76.6394,270.0,Critical
+2023-06-01,Mysore,Karnataka,12.2958,76.6394,275.0,Critical
+2023-07-01,Mysore,Karnataka,12.2958,76.6394,280.0,Critical
+2023-08-01,Mysore,Karnataka,12.2958,76.6394,285.0,Critical
+2023-09-01,Mysore,Karnataka,12.2958,76.6394,290.0,Critical
+2023-10-01,Mysore,Karnataka,12.2958,76.6394,295.0,Critical
+2023-11-01,Mysore,Karnataka,12.2958,76.6394,300.0,Critical
+2023-12-01,Mysore,Karnataka,12.2958,76.6394,305.0,Critical
+2024-01-01,Mysore,Karnataka,12.2958,76.6394,310.0,Critical
+2024-02-01,Mysore,Karnataka,12.2958,76.6394,315.0,Critical
+2024-03-01,Mysore,Karnataka,12.2958,76.6394,320.0,Critical
+2024-04-01,Mysore,Karnataka,12.2958,76.6394,325.0,Critical
+2024-05-01,Mysore,Karnataka,12.2958,76.6394,330.0,Critical
+2024-06-01,Mysore,Karnataka,12.2958,76.6394,335.0,Critical
+2024-07-01,Mysore,Karnataka,12.2958,76.6394,340.0,Critical
+2024-08-01,Mysore,Karnataka,12.2958,76.6394,345.0,Critical
+2024-09-01,Mysore,Karnataka,12.2958,76.6394,350.0,Critical
+2024-10-01,Mysore,Karnataka,12.2958,76.6394,355.0,Critical
+2024-11-01,Mysore,Karnataka,12.2958,76.6394,360.0,Critical
+2024-12-01,Mysore,Karnataka,12.2958,76.6394,365.0,Critical
+2025-01-01,Mysore,Karnataka,12.2958,76.6394,370.0,Critical
+2025-02-01,Mysore,Karnataka,12.2958,76.6394,375.0,Critical
+2025-03-01,Mysore,Karnataka,12.2958,76.6394,380.0,Critical
+2025-04-01,Mysore,Karnataka,12.2958,76.6394,385.0,Critical
+2025-05-01,Mysore,Karnataka,12.2958,76.6394,390.0,Critical
+2025-06-01,Mysore,Karnataka,12.2958,76.6394,395.0,Critical
+2025-07-01,Mysore,Karnataka,12.2958,76.6394,400.0,Critical
+2025-08-01,Mysore,Karnataka,12.2958,76.6394,405.0,Critical
+2025-09-01,Mysore,Karnataka,12.2958,76.6394,410.0,Critical
+2025-09-28,Mysore,Karnataka,12.2958,76.6394,414.5,Critical
+2023-01-01,Nagpur,Maharashtra,21.1458,79.0882,30.0,Normal
+2023-02-01,Nagpur,Maharashtra,21.1458,79.0882,31.0,Normal
+2023-03-01,Nagpur,Maharashtra,21.1458,79.0882,32.0,Normal
+2023-04-01,Nagpur,Maharashtra,21.1458,79.0882,33.0,Normal
+2023-05-01,Nagpur,Maharashtra,21.1458,79.0882,34.0,Normal
+2023-06-01,Nagpur,Maharashtra,21.1458,79.0882,35.0,Normal
+2023-07-01,Nagpur,Maharashtra,21.1458,79.0882,36.0,Normal
+2023-08-01,Nagpur,Maharashtra,21.1458,79.0882,37.0,Normal
+2023-09-01,Nagpur,Maharashtra,21.1458,79.0882,38.0,Normal
+2023-10-01,Nagpur,Maharashtra,21.1458,79.0882,39.0,Normal
+2023-11-01,Nagpur,Maharashtra,21.1458,79.0882,40.0,Normal
+2023-12-01,Nagpur,Maharashtra,21.1458,79.0882,41.0,Normal
+2024-01-01,Nagpur,Maharashtra,21.1458,79.0882,42.0,Normal
+2024-02-01,Nagpur,Maharashtra,21.1458,79.0882,43.0,Normal
+2024-03-01,Nagpur,Maharashtra,21.1458,79.0882,44.0,Normal
+2024-04-01,Nagpur,Maharashtra,21.1458,79.0882,45.0,Normal
+2024-05-01,Nagpur,Maharashtra,21.1458,79.0882,46.0,Normal
+2024-06-01,Nagpur,Maharashtra,21.1458,79.0882,47.0,Normal
+2024-07-01,Nagpur,Maharashtra,21.1458,79.0882,48.0,Normal
+2024-08-01,Nagpur,Maharashtra,21.1458,79.0882,49.0,Normal
+2024-09-01,Nagpur,Maharashtra,21.1458,79.0882,50.0,Normal
+2024-10-01,Nagpur,Maharashtra,21.1458,79.0882,51.0,Low
+2024-11-01,Nagpur,Maharashtra,21.1458,79.0882,52.0,Low
+2024-12-01,Nagpur,Maharashtra,21.1458,79.0882,53.0,Low
+2025-01-01,Nagpur,Maharashtra,21.1458,79.0882,54.0,Low
+2025-02-01,Nagpur,Maharashtra,21.1458,79.0882,55.0,Low
+2025-03-01,Nagpur,Maharashtra,21.1458,79.0882,56.0,Low
+2025-04-01,Nagpur,Maharashtra,21.1458,79.0882,57.0,Low
+2025-05-01,Nagpur,Maharashtra,21.1458,79.0882,58.0,Low
+2025-06-01,Nagpur,Maharashtra,21.1458,79.0882,59.0,Low
+2025-07-01,Nagpur,Maharashtra,21.1458,79.0882,60.0,Low
+2025-08-01,Nagpur,Maharashtra,21.1458,79.0882,61.0,Low
+2025-09-01,Nagpur,Maharashtra,21.1458,79.0882,62.0,Low
+2025-09-28,Nagpur,Maharashtra,21.1458,79.0882,62.9,Normal
+2023-01-01,Patna,Bihar,25.5941,85.1376,25.0,Normal
+2023-02-01,Patna,Bihar,25.5941,85.1376,25.8,Normal
+2023-03-01,Patna,Bihar,25.5941,85.1376,26.6,Normal
+2023-04-01,Patna,Bihar,25.5941,85.1376,27.4,Normal
+2023-05-01,Patna,Bihar,25.5941,85.1376,28.2,Normal
+2023-06-01,Patna,Bihar,25.5941,85.1376,29.0,Normal
+2023-07-01,Patna,Bihar,25.5941,85.1376,29.8,Normal
+2023-08-01,Patna,Bihar,25.5941,85.1376,30.6,Normal
+2023-09-01,Patna,Bihar,25.5941,85.1376,31.4,Normal
+2023-10-01,Patna,Bihar,25.5941,85.1376,32.2,Normal
+2023-11-01,Patna,Bihar,25.5941,85.1376,33.0,Normal
+2023-12-01,Patna,Bihar,25.5941,85.1376,33.8,Normal
+2024-01-01,Patna,Bihar,25.5941,85.1376,34.6,Normal
+2024-02-01,Patna,Bihar,25.5941,85.1376,35.4,Normal
+2024-03-01,Patna,Bihar,25.5941,85.1376,36.2,Normal
+2024-04-01,Patna,Bihar,25.5941,85.1376,37.0,Normal
+2024-05-01,Patna,Bihar,25.5941,85.1376,37.8,Normal
+2024-06-01,Patna,Bihar,25.5941,85.1376,38.6,Normal
+2024-07-01,Patna,Bihar,25.5941,85.1376,39.4,Normal
+2024-08-01,Patna,Bihar,25.5941,85.1376,40.2,Normal
+2024-09-01,Patna,Bihar,25.5941,85.1376,41.0,Normal
+2024-10-01,Patna,Bihar,25.5941,85.1376,41.8,Normal
+2024-11-01,Patna,Bihar,25.5941,85.1376,42.6,Normal
+2024-12-01,Patna,Bihar,25.5941,85.1376,43.4,Normal
+2025-01-01,Patna,Bihar,25.5941,85.1376,44.2,Normal
+2025-02-01,Patna,Bihar,25.5941,85.1376,45.0,Normal
+2025-03-01,Patna,Bihar,25.5941,85.1376,45.8,Normal
+2025-04-01,Patna,Bihar,25.5941,85.1376,46.6,Normal
+2025-05-01,Patna,Bihar,25.5941,85.1376,47.4,Normal
+2025-06-01,Patna,Bihar,25.5941,85.1376,48.2,Normal
+2025-07-01,Patna,Bihar,25.5941,85.1376,49.0,Normal
+2025-08-01,Patna,Bihar,25.5941,85.1376,49.8,Normal
+2025-09-01,Patna,Bihar,25.5941,85.1376,50.6,Low
+2025-09-28,Patna,Bihar,25.5941,85.1376,51.32,Normal
+2023-01-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2023-02-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2023-03-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2023-04-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2023-05-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2023-06-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2023-07-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2023-08-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2023-09-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2023-10-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2023-11-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2023-12-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2024-01-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2024-02-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2024-03-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2024-04-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2024-05-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2024-06-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2024-07-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2024-08-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2024-09-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2024-10-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2024-11-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2024-12-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2025-01-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2025-02-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2025-03-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2025-04-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2025-05-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2025-06-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2025-07-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2025-08-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,26.0,Normal
+2025-09-01 00:00:00,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2025-09-28,Pune,Maharashtra,18.5204,73.8567,25.0,Normal
+2023-01-01,Vadodara,Gujarat,22.3072,73.1812,45.0,Warning
+2023-02-01,Vadodara,Gujarat,22.3072,73.1812,46.8,Warning
+2023-03-01,Vadodara,Gujarat,22.3072,73.1812,48.6,Warning
+2023-04-01,Vadodara,Gujarat,22.3072,73.1812,50.4,Low
+2023-05-01,Vadodara,Gujarat,22.3072,73.1812,52.2,Low
+2023-06-01,Vadodara,Gujarat,22.3072,73.1812,54.0,Low
+2023-07-01,Vadodara,Gujarat,22.3072,73.1812,55.8,Low
+2023-08-01,Vadodara,Gujarat,22.3072,73.1812,57.6,Low
+2023-09-01,Vadodara,Gujarat,22.3072,73.1812,59.4,Low
+2023-10-01,Vadodara,Gujarat,22.3072,73.1812,61.2,Low
+2023-11-01,Vadodara,Gujarat,22.3072,73.1812,63.0,Low
+2023-12-01,Vadodara,Gujarat,22.3072,73.1812,64.8,Low
+2024-01-01,Vadodara,Gujarat,22.3072,73.1812,66.6,Low
+2024-02-01,Vadodara,Gujarat,22.3072,73.1812,68.4,Low
+2024-03-01,Vadodara,Gujarat,22.3072,73.1812,70.2,Low
+2024-04-01,Vadodara,Gujarat,22.3072,73.1812,72.0,Low
+2024-05-01,Vadodara,Gujarat,22.3072,73.1812,73.8,Low
+2024-06-01,Vadodara,Gujarat,22.3072,73.1812,75.6,Low
+2024-07-01,Vadodara,Gujarat,22.3072,73.1812,77.4,Low
+2024-08-01,Vadodara,Gujarat,22.3072,73.1812,79.2,Low
+2024-09-01,Vadodara,Gujarat,22.3072,73.1812,81.0,Low
+2024-10-01,Vadodara,Gujarat,22.3072,73.1812,82.8,Low
+2024-11-01,Vadodara,Gujarat,22.3072,73.1812,84.6,Low
+2024-12-01,Vadodara,Gujarat,22.3072,73.1812,86.4,Low
+2025-01-01,Vadodara,Gujarat,22.3072,73.1812,88.2,Low
+2025-02-01,Vadodara,Gujarat,22.3072,73.1812,90.0,Low
+2025-03-01,Vadodara,Gujarat,22.3072,73.1812,91.8,Low
+2025-04-01,Vadodara,Gujarat,22.3072,73.1812,93.6,Low
+2025-05-01,Vadodara,Gujarat,22.3072,73.1812,95.4,Low
+2025-06-01,Vadodara,Gujarat,22.3072,73.1812,97.2,Low
+2025-07-01,Vadodara,Gujarat,22.3072,73.1812,99.0,Low
+2025-08-01,Vadodara,Gujarat,22.3072,73.1812,100.8,Warning
+2025-09-01,Vadodara,Gujarat,22.3072,73.1812,102.6,Warning
+2025-09-28,Vadodara,Gujarat,22.3072,73.1812,104.22,Warning
+2023-01-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,15.0,Normal
+2023-02-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,15.6,Normal
+2023-03-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,16.2,Normal
+2023-04-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,16.8,Normal
+2023-05-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,17.4,Normal
+2023-06-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,18.0,Normal
+2023-07-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,18.6,Normal
+2023-08-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,19.2,Normal
+2023-09-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,19.8,Normal
+2023-10-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,20.4,Normal
+2023-11-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,21.0,Normal
+2023-12-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,21.6,Normal
+2024-01-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,22.2,Normal
+2024-02-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,22.8,Normal
+2024-03-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,23.4,Normal
+2024-04-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,24.0,Normal
+2024-05-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,24.6,Normal
+2024-06-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,25.2,Normal
+2024-07-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,25.8,Normal
+2024-08-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,26.4,Normal
+2024-09-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,27.0,Normal
+2024-10-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,27.6,Normal
+2024-11-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,28.2,Normal
+2024-12-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,28.8,Normal
+2025-01-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,29.4,Normal
+2025-02-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,30.0,Normal
+2025-03-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,30.6,Normal
+2025-04-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,31.2,Normal
+2025-05-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,31.8,Normal
+2025-06-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,32.4,Normal
+2025-07-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,33.0,Normal
+2025-08-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,33.6,Normal
+2025-09-01,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,34.2,Normal
+2025-09-28,Visakhapatnam,Andhra Pradesh,17.6868,83.2185,34.74,Normal

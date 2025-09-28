@@ -50,7 +50,22 @@ const Trends = () => {
           const response = await fetch(`http://localhost:5000/station/${selectedStation}/trends`);
           if (response.ok) {
             const data = await response.json();
-            setTrendsData(data.trends);
+            let trends = data.trends;
+            // If station 4, fetch live readings and prepend
+            if (selectedStation === 4) {
+              const liveResponse = await fetch(`http://localhost:5000/station/${selectedStation}/live`);
+              if (liveResponse.ok) {
+                const liveData = await liveResponse.json();
+                // Add live readings to trends, assuming liveData is array of {timestamp, water_level}
+                const liveTrends = liveData.map(item => ({
+                  date: new Date(item.timestamp).toISOString().split('T')[0],
+                  water_level: item.water_level,
+                  recharge_estimation: 0 // mock
+                }));
+                trends = [...liveTrends, ...trends];
+              }
+            }
+            setTrendsData(trends);
           } else {
             console.error('Failed to fetch trends');
           }

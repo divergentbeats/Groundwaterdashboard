@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
+import 'leaflet/dist/leaflet.css';
 import { motion } from 'framer-motion';
 
 import Layout from './components/Layout';
