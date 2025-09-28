@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ImageIcon, HomeIcon, Droplets, Filter, Calendar } from 'lucide-react';
+import { ImageIcon, HomeIcon, Droplets, Filter, Calendar, Grid3X3, Table, Download, RefreshCw } from 'lucide-react';
 import { useApp } from '../App';
 import { motion } from 'framer-motion';
 
@@ -13,6 +13,8 @@ const Readings = () => {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'table'
+  const [liveReading, setLiveReading] = useState(null);
   const readingsPerPage = 6;
 
   // Derive status from water_level
@@ -68,10 +70,17 @@ const Readings = () => {
               tag: getStatus(item.water_level),
               time: new Date(item.date).toLocaleString(),
               level: item.water_level,
-              battery: (3.5 + Math.random() * 0.5).toFixed(2), // Mock 3.5-4.0V
+              battery: item.type === 'live' ? (item.battery || (3.5 + Math.random() * 0.5).toFixed(2)) : (3.5 + Math.random() * 0.5).toFixed(2),
               recharge: item.recharge_estimation
             }));
             setReadings(mappedReadings);
+
+            // Check for live reading (latest within 5 minutes)
+            if (trends.length > 0 && trends[0].type === 'live') {
+              setLiveReading(mappedReadings[0]);
+            } else {
+              setLiveReading(null);
+            }
           } else {
             setError('Failed to fetch readings');
           }
@@ -83,6 +92,11 @@ const Readings = () => {
       };
 
       fetchReadings();
+
+      // Set up polling every 30 seconds
+      const interval = setInterval(fetchReadings, 30000);
+
+      return () => clearInterval(interval);
     }
   }, [selectedStation]);
 
@@ -114,6 +128,30 @@ const Readings = () => {
     (currentPage - 1) * readingsPerPage,
     currentPage * readingsPerPage
   );
+
+  const exportToCSV = () => {
+    const headers = ['Time', 'Status', 'Water Level (m)', 'Recharge (m)', 'Battery (V)'];
+    const csvContent = [
+      headers.join(','),
+      ...filteredReadings.map(reading => [
+        `"${reading.time}"`,
+        reading.tag,
+        reading.level.toFixed(2),
+        reading.recharge.toFixed(2),
+        reading.battery
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `readings_station_${selectedStation}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   if (loading) {
     return (
@@ -153,6 +191,55 @@ const Readings = () => {
         <p className="text-cyan-100 text-sm">
           View historical water level readings from monitoring stations
         </p>
+      </div>
+
+      {/* View Toggle and Export */}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex gap-2">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setViewMode('cards')}
+            className={`group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-md font-medium border transition-all duration-300 ${
+              viewMode === 'cards'
+                ? 'bg-cyan-500/20 text-cyan-50 border-cyan-400/30'
+                : 'bg-white/20 text-cyan-50 border-white/30 hover:bg-white/30'
+            }`}
+          >
+            <Grid3X3 size={16} />
+            Cards
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setViewMode('table')}
+            className={`group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-md font-medium border transition-all duration-300 ${
+              viewMode === 'table'
+                ? 'bg-cyan-500/20 text-cyan-50 border-cyan-400/30'
+                : 'bg-white/20 text-cyan-50 border-white/30 hover:bg-white/30'
+            }`}
+          >
+            <Table size={16} />
+            Table
+          </motion.button>
+        </div>
+        <div className="flex gap-2 items-center">
+          {liveReading && (
+            <div className="flex items-center gap-2 text-emerald-300 text-sm">
+              <RefreshCw size={14} className="animate-spin" />
+              Live data available
+            </div>
+          )}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={exportToCSV}
+            className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 backdrop-blur-md text-emerald-50 font-medium border border-emerald-400/30 hover:bg-emerald-500/30 transition-all duration-300"
+          >
+            <Download size={16} />
+            Export CSV
+          </motion.button>
+        </div>
       </div>
 
       {/* Filter Controls */}
@@ -226,55 +313,112 @@ const Readings = () => {
         </div>
       </div>
 
-      {/* Reading Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
-        {paginatedReadings.length === 0 ? (
-          <div className="col-span-full flex items-center justify-center h-64 text-cyan-100">
-            No readings match the selected filters.
+      {/* Reading Display */}
+      {viewMode === 'cards' ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
+          {paginatedReadings.length === 0 ? (
+            <div className="col-span-full flex items-center justify-center h-64 text-cyan-100">
+              No readings match the selected filters.
+            </div>
+          ) : (
+            paginatedReadings.map((card, index) => (
+              <motion.div
+                key={card.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 hover:bg-white/15 transition-all duration-300"
+                whileHover={{ y: -2 }}
+              >
+                <div className="aspect-video bg-cyan-500/20 rounded-t-2xl overflow-hidden flex items-center justify-center">
+                  <Droplets className="text-cyan-300" size={48} />
+                </div>
+                <div className="p-4">
+                  <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${getStatusClasses(card.tag)}`}>
+                    {card.tag}
+                  </div>
+                  <h3 className="font-semibold text-cyan-100 text-sm mb-2">{card.time}</h3>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                    <div className="text-cyan-100">
+                      Water Level: <span className="font-medium text-cyan-50">{card.level.toFixed(2)}m</span>
+                    </div>
+                    <div className="text-cyan-100">
+                      Recharge: <span className="font-medium text-cyan-50">{card.recharge.toFixed(2)}m</span>
+                    </div>
+                    <div className="text-cyan-100">
+                      Battery: <span className="font-medium text-cyan-50">{card.battery}V</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex justify-end">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-white/20 backdrop-blur-md text-cyan-50 font-medium border border-white/30 hover:bg-white/30 transition-all duration-300"
+                    >
+                      <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      View Details
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          )}
+        </div>
+      ) : (
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 overflow-hidden flex-1">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-white/10">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-cyan-100 uppercase tracking-wider">Time</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-cyan-100 uppercase tracking-wider">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-cyan-100 uppercase tracking-wider">Water Level (m)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-cyan-100 uppercase tracking-wider">Recharge (m)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-cyan-100 uppercase tracking-wider">Battery (V)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-cyan-100 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/10">
+                {paginatedReadings.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-4 py-8 text-center text-cyan-100">
+                      No readings match the selected filters.
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedReadings.map((reading, index) => (
+                    <motion.tr
+                      key={reading.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="hover:bg-white/5 transition-colors"
+                    >
+                      <td className="px-4 py-3 text-sm text-cyan-100">{reading.time}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusClasses(reading.tag)}`}>
+                          {reading.tag}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-cyan-100">{reading.level.toFixed(2)}</td>
+                      <td className="px-4 py-3 text-sm text-cyan-100">{reading.recharge.toFixed(2)}</td>
+                      <td className="px-4 py-3 text-sm text-cyan-100">{reading.battery}</td>
+                      <td className="px-4 py-3">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          className="group relative inline-flex items-center px-3 py-1 rounded-lg bg-white/20 backdrop-blur-md text-cyan-50 text-xs font-medium border border-white/30 hover:bg-white/30 transition-all duration-300"
+                        >
+                          <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          View
+                        </motion.button>
+                      </td>
+                    </motion.tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-        ) : (
-          paginatedReadings.map((card, index) => (
-            <motion.div
-              key={card.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 hover:bg-white/15 transition-all duration-300"
-              whileHover={{ y: -2 }}
-            >
-              <div className="aspect-video bg-cyan-500/20 rounded-t-2xl overflow-hidden flex items-center justify-center">
-                <Droplets className="text-cyan-300" size={48} />
-              </div>
-              <div className="p-4">
-                <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${getStatusClasses(card.tag)}`}>
-                  {card.tag}
-                </div>
-                <h3 className="font-semibold text-cyan-100 text-sm mb-2">{card.time}</h3>
-                <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
-                  <div className="text-cyan-100">
-                    Water Level: <span className="font-medium text-cyan-50">{card.level.toFixed(2)}m</span>
-                  </div>
-                  <div className="text-cyan-100">
-                    Recharge: <span className="font-medium text-cyan-50">{card.recharge.toFixed(2)}m</span>
-                  </div>
-                  <div className="text-cyan-100">
-                    Battery: <span className="font-medium text-cyan-50">{card.battery}V</span>
-                  </div>
-                </div>
-                <div className="mt-4 flex justify-end">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-white/20 backdrop-blur-md text-cyan-50 font-medium border border-white/30 hover:bg-white/30 transition-all duration-300"
-                  >
-                    <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    View Details
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-          ))
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (

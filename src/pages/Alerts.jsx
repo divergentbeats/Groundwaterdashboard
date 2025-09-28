@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, AlertTriangle, Info, CheckCircle, HomeIcon } from 'lucide-react';
 import { useApp } from '../App';
 import { motion } from 'framer-motion';
@@ -7,83 +7,121 @@ const Alerts = () => {
   const { setCurrentView, setSelectedStation } = useApp();
   const [filterType, setFilterType] = useState('all');
   const [filterTime, setFilterTime] = useState('all');
-  const [alerts, setAlerts] = useState([
-    { 
-      id: 'a1', 
-      type: 'warning', 
-      title: 'Low Water Level', 
-      message: 'Station ID-1234 has reported water level below threshold (7.2m)', 
-      time: '2 hours ago',
-      station: 'Coastal Station 1'
-    },
-    { 
-      id: 'a2', 
-      type: 'critical', 
-      title: 'Battery Critical', 
-      message: 'Station ID-5678 battery level critical (2.1V). Maintenance required.', 
-      time: '5 hours ago',
-      station: 'Mountain Station 3'
-    },
-    { 
-      id: 'a3', 
-      type: 'info', 
-      title: 'Maintenance Scheduled', 
-      message: 'Routine maintenance scheduled for Station ID-9012 on Oct 15, 2023', 
-      time: '1 day ago',
-      station: 'Valley Station 7'
-    },
-    { 
-      id: 'a4', 
-      type: 'success', 
-      title: 'Station Online', 
-      message: 'Station ID-3456 is back online after maintenance', 
-      time: '2 days ago',
-      station: 'River Station 2'
-    },
-    {
-      id: 'a5',
-      type: 'warning',
-      title: 'Unusual Reading Pattern',
-      message: 'Station ID-7890 showing unusual fluctuation patterns in last 24 hours',
-      time: '3 days ago',
-      station: 'Lake Station 5'
+  const [alerts, setAlerts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [summary, setSummary] = useState({ total: 0, critical: 0, warning: 0, info: 0, success: 0 });
+
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('http://localhost:5000/alerts');
+        if (response.ok) {
+          const data = await response.json();
+          // Map backend data to component format
+          const mappedAlerts = data.map(alert => ({
+            id: alert.id,
+            type: alert.type || alert.alert_level,
+            title: alert.title,
+            message: alert.message,
+            time: new Date(alert.time || alert.timestamp).toLocaleString(),
+            station: alert.station_name,
+            stationId: alert.station_id
+          }));
+          setAlerts(mappedAlerts);
+
+          // Calculate summary
+          const counts = { total: 0, critical: 0, warning: 0, info: 0, success: 0 };
+          mappedAlerts.forEach(alert => {
+            counts.total++;
+            if (alert.type === 'critical') counts.critical++;
+            else if (alert.type === 'warning') counts.warning++;
+            else if (alert.type === 'info') counts.info++;
+            else if (alert.type === 'success') counts.success++;
+          });
+          setSummary(counts);
+        } else {
+          setError('Failed to fetch alerts');
+        }
+      } catch (err) {
+        setError('Error fetching alerts: ' + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAlerts();
+    const interval = setInterval(fetchAlerts, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const resolveAlert = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:5000/alerts/${id}/resolve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (response.ok) {
+        setAlerts(alerts.filter(alert => alert.id !== id));
+        // Update summary
+        const counts = { ...summary, total: summary.total - 1 };
+        if (alerts.find(a => a.id === id)?.type === 'critical') counts.critical--;
+        else if (alerts.find(a => a.id === id)?.type === 'warning') counts.warning--;
+        else if (alerts.find(a => a.id === id)?.type === 'info') counts.info--;
+        else if (alerts.find(a => a.id === id)?.type === 'success') counts.success--;
+        setSummary(counts);
+      }
+    } catch (err) {
+      console.error('Error resolving alert:', err);
     }
-  ]);
+  };
+
+  const viewDetails = (alert) => {
+    if (alert.stationId) {
+      setSelectedStation(alert.stationId);
+      setCurrentView('Readings');
+    }
+  };
 
   const filteredAlerts = alerts.filter(alert => {
     if (filterType !== 'all' && alert.type !== filterType) return false;
-    // Time filter logic
+    // Time filter logic - adjust for real timestamps
     if (filterTime !== 'all') {
-      const timeStr = alert.time;
-      if (filterTime === '24h') {
-        if (timeStr.includes('day')) return false;
-      } else if (filterTime === '7d') {
-        if (timeStr.includes('day')) {
-          const num = parseInt(timeStr);
-          if (num > 7) return false;
-        }
-      } else if (filterTime === '30d') {
-        if (timeStr.includes('day')) {
-          const num = parseInt(timeStr);
-          if (num > 30) return false;
-        }
-      }
+      const alertDate = new Date(alert.time);
+      const now = new Date();
+      const diffMs = now - alertDate;
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
+      if (filterTime === '24h' && diffDays > 1) return false;
+      if (filterTime === '7d' && diffDays > 7) return false;
+      if (filterTime === '30d' && diffDays > 30) return false;
     }
     return true;
   });
 
-  const resolveAlert = (id) => {
-    setAlerts(alerts.filter(alert => alert.id !== id));
-  };
+  if (loading) {
+    return (
+      <div className="h-full flex flex-col w-full items-center justify-center">
+        <div className="text-cyan-100 text-lg">Loading alerts...</div>
+      </div>
+    );
+  }
 
-  const viewDetails = (alert) => {
-    // Extract station id from message, e.g. 'Station ID-1234'
-    const match = alert.message.match(/Station ID-(\d+)/);
-    if (match) {
-      setSelectedStation(parseInt(match[1]));
-      setCurrentView('Readings');
-    }
-  };
+  if (error) {
+    return (
+      <div className="h-full flex flex-col w-full items-center justify-center">
+        <div className="text-red-300 text-lg">{error}</div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          onClick={() => window.location.reload()}
+          className="mt-4 px-6 py-3 rounded-2xl bg-white/20 backdrop-blur-md text-cyan-50 font-semibold border border-white/30"
+        >
+          Retry
+        </motion.button>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col w-full">
@@ -109,43 +147,23 @@ const Alerts = () => {
         </p>
       </div>
 
-      {/* Alert Summary */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 flex items-center hover:bg-white/15 transition-all duration-300">
-          <div className="rounded-full bg-rose-500/20 p-3 mr-3">
-            <AlertTriangle className="text-rose-300" size={20} />
-          </div>
-          <div>
-            <p className="text-sm text-cyan-100">Critical</p>
-            <p className="text-xl font-bold text-cyan-50">1</p>
-          </div>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center">
+          <div className="text-2xl font-bold text-cyan-50">{summary.total}</div>
+          <div className="text-xs text-cyan-200">Total Alerts</div>
         </div>
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 flex items-center hover:bg-white/15 transition-all duration-300">
-          <div className="rounded-full bg-amber-500/20 p-3 mr-3">
-            <AlertTriangle className="text-amber-300" size={20} />
-          </div>
-          <div>
-            <p className="text-sm text-cyan-100">Warnings</p>
-            <p className="text-xl font-bold text-cyan-50">2</p>
-          </div>
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center">
+          <div className="text-2xl font-bold text-red-400">{summary.critical}</div>
+          <div className="text-xs text-cyan-200">Critical</div>
         </div>
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 flex items-center hover:bg-white/15 transition-all duration-300">
-          <div className="rounded-full bg-blue-500/20 p-3 mr-3">
-            <Info className="text-blue-300" size={20} />
-          </div>
-          <div>
-            <p className="text-sm text-cyan-100">Info</p>
-            <p className="text-xl font-bold text-cyan-50">1</p>
-          </div>
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center">
+          <div className="text-2xl font-bold text-amber-400">{summary.warning}</div>
+          <div className="text-xs text-cyan-200">Warnings</div>
         </div>
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 flex items-center hover:bg-white/15 transition-all duration-300">
-          <div className="rounded-full bg-emerald-500/20 p-3 mr-3">
-            <CheckCircle className="text-emerald-300" size={20} />
-          </div>
-          <div>
-            <p className="text-sm text-cyan-100">Resolved</p>
-            <p className="text-xl font-bold text-cyan-50">1</p>
-          </div>
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center">
+          <div className="text-2xl font-bold text-blue-400">{summary.info + summary.success}</div>
+          <div className="text-xs text-cyan-200">Info</div>
         </div>
       </div>
 
@@ -198,55 +216,61 @@ const Alerts = () => {
 
       {/* Alert List */}
       <div className="space-y-4 flex-1">
-        {filteredAlerts.map(alert => (
-          <motion.div 
-            key={alert.id} 
-            className={`bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 border-l-4 hover:bg-white/15 transition-all duration-300 ${
-              alert.type === 'critical' ? 'border-l-rose-400' :
-              alert.type === 'warning' ? 'border-l-amber-400' :
-              alert.type === 'info' ? 'border-l-blue-400' :
-              'border-l-emerald-400'
-            }`}
-            whileHover={{ y: -2 }}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex items-start">
-                <div className="mr-4 mt-1">
-                  {alert.type === 'critical' && <AlertTriangle className="text-rose-300" size={20} />}
-                  {alert.type === 'warning' && <AlertTriangle className="text-amber-300" size={20} />}
-                  {alert.type === 'info' && <Info className="text-blue-300" size={20} />}
-                  {alert.type === 'success' && <CheckCircle className="text-emerald-300" size={20} />}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-cyan-100">{alert.title}</h3>
-                  <p className="text-sm text-cyan-100 mt-1">{alert.message}</p>
-                  <div className="mt-2 flex items-center text-xs text-cyan-200">
-                    <span className="mr-3">{alert.time}</span>
-                    <span>{alert.station}</span>
+        {filteredAlerts.length === 0 ? (
+          <div className="text-center text-cyan-100 py-8">No alerts match the selected filters.</div>
+        ) : (
+          filteredAlerts.map(alert => (
+            <motion.div
+              key={alert.id}
+              className={`bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 border-l-4 hover:bg-white/15 transition-all duration-300 ${
+                alert.type === 'critical' ? 'border-l-rose-400' :
+                alert.type === 'warning' ? 'border-l-amber-400' :
+                alert.type === 'info' ? 'border-l-blue-400' :
+                'border-l-emerald-400'
+              }`}
+              whileHover={{ y: -2 }}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-start">
+                  <div className="mr-4 mt-1">
+                    {alert.type === 'critical' && <AlertTriangle className="text-rose-300" size={20} />}
+                    {alert.type === 'warning' && <AlertTriangle className="text-amber-300" size={20} />}
+                    {alert.type === 'info' && <Info className="text-blue-300" size={20} />}
+                    {alert.type === 'success' && <CheckCircle className="text-emerald-300" size={20} />}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-cyan-100">{alert.title}</h3>
+                    <p className="text-sm text-cyan-100 mt-1">{alert.message}</p>
+                    <div className="mt-2 flex items-center text-xs text-cyan-200">
+                      <span className="mr-3">{alert.time}</span>
+                      <span>{alert.station}</span>
+                    </div>
                   </div>
                 </div>
+                <div className="flex flex-col sm:flex-row gap-2 justify-end">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => viewDetails(alert)}
+                    className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-white/20 backdrop-blur-md text-cyan-50 text-xs font-medium border border-white/30 hover:bg-white/30 transition-all duration-300"
+                  >
+                    <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    View Details
+                  </motion.button>
+                  {alert.type !== 'info' && alert.type !== 'success' && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      onClick={() => resolveAlert(alert.id)}
+                      className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-rose-500/20 backdrop-blur-md text-rose-300 text-xs font-medium border border-rose-400/30 hover:bg-rose-500/30 transition-all duration-300"
+                    >
+                      <span className="absolute inset-0 bg-gradient-to-r from-rose-400/20 to-red-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Resolve
+                    </motion.button>
+                  )}
+                </div>
               </div>
-              <div className="flex space-x-2">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  onClick={() => viewDetails(alert)}
-                  className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-white/20 backdrop-blur-md text-cyan-50 text-xs font-medium border border-white/30 hover:bg-white/30 transition-all duration-300"
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  View Details
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  onClick={() => resolveAlert(alert.id)}
-                  className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-rose-500/20 backdrop-blur-md text-rose-300 text-xs font-medium border border-rose-400/30 hover:bg-rose-500/30 transition-all duration-300"
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-rose-400/20 to-red-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  Resolve
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))
+        )}
       </div>
 
       {/* Pagination */}
@@ -258,7 +282,7 @@ const Alerts = () => {
           >
             &laquo;
           </motion.button>
-          <motion.button 
+          <motion.button
             whileHover={{ scale: 1.05 }}
             className="p-2 rounded-lg bg-emerald-500/20 text-emerald-100 border border-emerald-400/30 min-w-[2.5rem] text-center hover:bg-emerald-500/30 transition-all duration-300"
           >

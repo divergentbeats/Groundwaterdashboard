@@ -18,7 +18,27 @@ const Maps = () => {
         const response = await fetch('http://localhost:5000/stations');
         if (response.ok) {
           const data = await response.json();
-          setStations(data);
+          // Fetch live stations
+          const liveResponse = await fetch('http://localhost:5000/stations/live');
+          let liveStations = [];
+          if (liveResponse.ok) {
+            liveStations = await liveResponse.json();
+          }
+          // Merge live data into stations
+          const mergedStations = data.map(station => {
+            const live = liveStations.find(l => l.station_id === station.id);
+            if (live) {
+              return {
+                ...station,
+                water_level: live.current_level,
+                isLive: true,
+                last_updated: live.last_updated,
+                liveData: live
+              };
+            }
+            return { ...station, isLive: false };
+          });
+          setStations(mergedStations);
         } else {
           console.error('Failed to fetch stations');
         }
@@ -32,8 +52,8 @@ const Maps = () => {
     fetchStations();
   }, []);
 
-  // Color-coded icons based on status
-  const getIcon = (status) => {
+  // Color-coded icons based on status, with live indicator
+  const getIcon = (status, hasLive) => {
     let color = '#10b981'; // green for normal
     let iconClass = 'normal';
 
@@ -45,8 +65,11 @@ const Maps = () => {
       iconClass = 'critical';
     }
 
+    const pulseClass = hasLive ? 'animate-pulse' : '';
+    const liveBorder = hasLive ? 'border-4 border-cyan-300' : 'border-3 border-white';
+
     return L.divIcon({
-      html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>`,
+      html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; ${liveBorder}; box-shadow: 0 2px 6px rgba(0,0,0,0.3);" class="${pulseClass}"></div>`,
       className: `leaflet-div-icon ${iconClass}`,
       iconSize: [20, 20],
       iconAnchor: [10, 10],
@@ -102,14 +125,28 @@ const Maps = () => {
               <Marker
                 key={station.id}
                 position={[station.latitude, station.longitude]}
-                icon={getIcon(station.status)}
+                icon={getIcon(station.status, station.isLive)}
               >
                 <Popup>
                   <div className="p-4 min-w-[200px]">
-                    <h3 className="font-bold text-lg text-black mb-2">{station.name}</h3>
+                    <h3 className="font-bold text-lg text-black mb-2 flex items-center gap-2">
+                      {station.name}
+                      {station.liveData && (
+                        <span className="bg-cyan-100 text-cyan-800 text-xs px-2 py-1 rounded-full font-medium">
+                          Live Data
+                        </span>
+                      )}
+                    </h3>
                     <div className="space-y-1 text-sm text-gray-700">
                       <div>City: {station.city}</div>
-                      <div>Current Water Level: {station.water_level}m</div>
+                      <div>
+                        {station.isLive ? 'Live Water Level' : 'Current Water Level'}: {station.water_level}m
+                        {station.isLive && (
+                          <span className="text-xs text-gray-500 block">
+                            Last updated: {new Date(station.last_updated).toLocaleString()}
+                          </span>
+                        )}
+                      </div>
                       <div>Recharge Pattern: {station.recharge_pattern}</div>
                       <div>Status: <span className={`capitalize ${station.status === 'normal' ? 'text-green-600' : station.status === 'warning' ? 'text-yellow-600' : 'text-red-600'}`}>{station.status}</span></div>
                     </div>
