@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { Droplets, TrendingUp, BellRing, MapPin, HomeIcon, LineChart as LineChartIcon, BarChart3 } from 'lucide-react';
+import L from 'leaflet';
+import { Droplets, TrendingUp, BellRing, MapPin, Home as HomeIcon, LineChart as LineChartIcon, BarChart3 } from 'lucide-react';
 import { useApp } from '../App';
 import { motion } from 'framer-motion';
 import {
@@ -12,28 +13,63 @@ import {
   Tooltip,
   CartesianGrid,
   BarChart,
-  Bar,
-  Legend
+  Bar
 } from 'recharts';
 
 const Dashboard = () => {
-  const { stations, setCurrentView } = useApp();
-  const mapCenter = [20.5937, 78.9629]; // Center of India
+  const { setCurrentView } = useApp();
+  const [stations, setStations] = useState([]);
+  const [trendsData, setTrendsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const mapCenter = [21, 78]; // Center of India
+
+  useEffect(() => {
+    const fetchStations = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/stations');
+        if (response.ok) {
+          const data = await response.json();
+          setStations(data);
+          if (data.length > 0) {
+            // Fetch trends for the first station
+            const trendsResponse = await fetch(`http://localhost:5000/station/${data[0].id}/trends`);
+            if (trendsResponse.ok) {
+              const trends = await trendsResponse.json();
+              setTrendsData(trends.trends);
+            }
+          }
+        } else {
+          console.error('Failed to fetch stations');
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStations();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="h-full flex flex-col w-full items-center justify-center">
+        <div className="text-cyan-100 text-lg">Loading dashboard...</div>
+      </div>
+    );
+  }
 
   // Calculate average water level
-  const avgWaterLevel = stations.reduce((sum, station) => sum + station.currentLevel, 0) / stations.length;
+  const avgWaterLevel = stations.reduce((sum, station) => sum + station.water_level, 0) / stations.length;
   
-  // Calculate average recharge rate
-  const avgRechargeRate = stations.reduce((sum, station) => sum + station.rechargeRate, 0) / stations.length;
-  
-  // Count stations with low water levels (below 8m)
-  const lowLevelStations = stations.filter(station => station.currentLevel < 8).length;
+  // Count critical stations
+  const criticalStations = stations.filter(station => station.status === 'critical').length;
 
   // Combined data for comparison chart
   const comparisonData = stations.map(station => ({
     name: station.name.replace(' DWLR Station', ''),
-    level: station.currentLevel,
-    recharge: station.rechargeRate
+    level: station.water_level,
+    status: station.status
   }));
 
   return (
@@ -43,7 +79,7 @@ const Dashboard = () => {
         whileHover={{ scale: 1.05, y: -2 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setCurrentView('landing')}
-        className="group relative mb-6 inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/20 backdrop-blur-md text-white font-semibold shadow-xl hover:shadow-2xl border border-white/30 transition-all duration-300 self-start"
+        className="group relative mb-6 inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/20 backdrop-blur-md text-cyan-50 font-semibold shadow-xl hover:shadow-2xl border border-white/30 transition-all duration-300 self-start"
       >
         <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
         <HomeIcon size={18} />
@@ -60,16 +96,16 @@ const Dashboard = () => {
           trendDirection="down"
         />
         <StatCard 
-          title="Recharge Rate" 
-          value={`${avgRechargeRate.toFixed(1)} mm/day`} 
-          icon={<TrendingUp className="text-emerald-300" />}
-          trend="+0.2 from last month"
-          trendDirection="up"
+          title="Active Stations" 
+          value={`${stations.length} stations`} 
+          icon={<MapPin className="text-emerald-300" />}
+          trend="No change from last month"
+          trendDirection="neutral"
         />
         <StatCard 
-          title="Low Level Alerts" 
-          value={`${lowLevelStations} stations`} 
-          icon={<BellRing className="text-amber-300" />}
+          title="Critical Alerts" 
+          value={`${criticalStations} stations`} 
+          icon={<BellRing className="text-red-300" />}
           trend="No change from last month"
           trendDirection="neutral"
         />
@@ -79,27 +115,27 @@ const Dashboard = () => {
         {/* Main Chart */}
         <div className="lg:col-span-2">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-            <h2 className="text-lg font-semibold mb-4 text-white flex items-center gap-2">
+            <h2 className="text-lg font-semibold mb-4 text-cyan-100 flex items-center gap-2">
               <LineChartIcon size={18} className="text-cyan-300" />
-              Water Level Trends
+              Water Level Trends (First Station)
             </h2>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={stations[0].historicalData}>
+                <LineChart data={trendsData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="name" stroke="rgba(255,255,255,0.6)" />
+                  <XAxis dataKey="date" stroke="rgba(255,255,255,0.6)" />
                   <YAxis stroke="rgba(255,255,255,0.6)" />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'rgba(255,255,255,0.1)', 
                       border: '1px solid rgba(255,255,255,0.2)',
                       borderRadius: '0.5rem',
-                      color: 'white'
+                      color: 'rgb(224 242 254)'
                     }} 
                   />
                   <Line 
                     type="monotone" 
-                    dataKey="level" 
+                    dataKey="water_level" 
                     stroke="#0ea5e9" 
                     strokeWidth={2} 
                     dot={{ fill: "#0ea5e9" }} 
@@ -113,7 +149,7 @@ const Dashboard = () => {
         {/* Map */}
         <div className="lg:col-span-1">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-            <h2 className="text-lg font-semibold mb-4 text-white flex items-center gap-2">
+            <h2 className="text-lg font-semibold mb-4 text-cyan-100 flex items-center gap-2">
               <MapPin size={18} className="text-cyan-300" />
               Station Map
             </h2>
@@ -128,21 +164,39 @@ const Dashboard = () => {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                {stations.map((station) => (
-                  <Marker
-                    key={station.id}
-                    position={station.location}
-                  >
-                    <Popup>
-                      <div className="p-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-                        <h3 className="font-semibold text-sm text-white">{station.name}</h3>
-                        <div className="text-xs mt-1 text-cyan-100">
-                          Current Level: {station.currentLevel}m
+                {stations.map((station) => {
+                  // Simple color based on status
+                  const getIcon = (status) => {
+                    let color = '#10b981'; // green
+                    if (status === 'warning') color = '#f59e0b';
+                    if (status === 'critical') color = '#ef4444';
+                    return L.divIcon({
+                      html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>`,
+                      iconSize: [12, 12],
+                      iconAnchor: [6, 6],
+                    });
+                  };
+
+                  return (
+                    <Marker
+                      key={station.id}
+                      position={[station.latitude, station.longitude]}
+                      icon={getIcon(station.status)}
+                    >
+                      <Popup>
+                        <div className="p-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+                          <h3 className="font-semibold text-sm text-cyan-100">{station.name}</h3>
+                          <div className="text-xs mt-1 text-cyan-100">
+                            Water Level: {station.water_level}m
+                          </div>
+                          <div className="text-xs text-cyan-100">
+                            Status: {station.status}
+                          </div>
                         </div>
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
+                      </Popup>
+                    </Marker>
+                  );
+                })}
               </MapContainer>
             </div>
           </div>
@@ -152,7 +206,7 @@ const Dashboard = () => {
       {/* Comparison Chart */}
       <div className="mt-6 w-full">
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-          <h2 className="text-lg font-semibold mb-4 text-white flex items-center gap-2">
+          <h2 className="text-lg font-semibold mb-4 text-cyan-100 flex items-center gap-2">
             <BarChart3 size={18} className="text-emerald-300" />
             Station Comparison
           </h2>
@@ -162,17 +216,15 @@ const Dashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                 <XAxis dataKey="name" stroke="rgba(255,255,255,0.6)" />
                 <YAxis stroke="rgba(255,255,255,0.6)" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(255,255,255,0.1)', 
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: '0.5rem',
-                    color: 'white'
-                  }} 
-                />
-                <Legend wrapperStyle={{ color: 'white' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'rgba(255,255,255,0.1)', 
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      borderRadius: '0.5rem',
+                      color: 'rgb(224 242 254)'
+                    }} 
+                  />
                 <Bar dataKey="level" name="Water Level (m)" fill="#0ea5e9" />
-                <Bar dataKey="recharge" name="Recharge Rate (mm/day)" fill="#10b981" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -182,31 +234,31 @@ const Dashboard = () => {
   );
 };
 
-const StatCard = ({ title, value, icon, trend, trendDirection }) => {
-  const getTrendColor = () => {
-    switch (trendDirection) {
-      case 'up': return 'text-cyan-300';
-      case 'down': return 'text-rose-300';
-      default: return 'text-cyan-300';
-    }
-  };
+  const StatCard = ({ title, value, icon, trend, trendDirection }) => {
+    const getTrendColor = () => {
+      switch (trendDirection) {
+        case 'up': return 'text-cyan-300';
+        case 'down': return 'text-rose-300';
+        default: return 'text-cyan-300';
+      }
+    };
 
-  return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 flex flex-col hover:bg-white/15 transition-all duration-300">
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="text-sm font-medium text-cyan-100 mb-2">{title}</h3>
-          <p className="text-2xl font-bold text-white">{value}</p>
+    return (
+      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 flex flex-col hover:bg-white/15 transition-all duration-300">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="text-sm font-medium text-cyan-100 mb-2">{title}</h3>
+            <p className="text-2xl font-bold text-cyan-50">{value}</p>
+          </div>
+          <div className="p-3 rounded-full bg-white/20">
+            {React.cloneElement(icon, { size: 24 })}
+          </div>
         </div>
-        <div className="p-3 rounded-full bg-white/20">
-          {React.cloneElement(icon, { size: 24 })}
+        <div className={`mt-4 text-xs ${getTrendColor()}`}>
+          {trend}
         </div>
       </div>
-      <div className={`mt-4 text-xs ${getTrendColor()}`}>
-        {trend}
-      </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default Dashboard;

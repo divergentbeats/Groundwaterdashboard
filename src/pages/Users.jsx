@@ -1,18 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { UserRound, UserPlus, Search, Filter, HomeIcon } from 'lucide-react';
 import { useApp } from '../App';
 
 const Users = () => {
   const { theme, setCurrentView } = useApp();
-  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRole, setFilterRole] = useState('all');
+
   // Mock user data
-  const users = [
+  const [users, setUsers] = useState([
     { id: 1, name: 'Admin User', email: 'admin@aquasense.org', role: 'Administrator', status: 'Active' },
     { id: 2, name: 'Field Technician', email: 'tech@aquasense.org', role: 'Technician', status: 'Active' },
     { id: 3, name: 'Data Analyst', email: 'analyst@aquasense.org', role: 'Analyst', status: 'Away' },
     { id: 4, name: 'Guest User', email: 'guest@aquasense.org', role: 'Guest', status: 'Inactive' },
-  ];
+  ]);
+
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = filterRole === 'all' || user.role === filterRole;
+    return matchesSearch && matchesRole;
+  });
+
+  const deleteUser = (id) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      setUsers(users.filter(user => user.id !== id));
+    }
+  };
+
+  const editUser = (id) => {
+    alert(`Edit functionality for user ${id} coming soon!`);
+  };
+
+  const addUser = () => {
+    alert('Add user functionality coming soon!');
+  };
 
   return (
     <div className="h-full flex flex-col w-full">
@@ -21,7 +44,7 @@ const Users = () => {
         whileHover={{ scale: 1.05, y: -2 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setCurrentView('landing')}
-        className="group relative mb-6 inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/20 backdrop-blur-md text-white font-semibold shadow-xl hover:shadow-2xl border border-white/30 transition-all duration-300 self-start"
+        className="group relative mb-6 inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/20 backdrop-blur-md text-cyan-50 font-semibold shadow-xl hover:shadow-2xl border border-white/30 transition-all duration-300 self-start"
       >
         <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
         <HomeIcon size={18} />
@@ -34,7 +57,7 @@ const Users = () => {
         transition={{ duration: 0.5 }}
         className="mb-6 flex-1"
       >
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Users Management</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-cyan-100 mb-2">Users Management</h1>
         <p className="text-cyan-100 opacity-80">Manage user accounts and permissions</p>
       </motion.div>
 
@@ -45,22 +68,30 @@ const Users = () => {
           <input
             type="text"
             placeholder="Search users..."
-            className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder:text-cyan-100/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-cyan-100 placeholder:text-cyan-100/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
           />
         </div>
         <div className="flex gap-3">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/20 backdrop-blur-md text-white font-medium border border-white/30 hover:bg-white/30 transition-all duration-300"
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Filter size={16} />
-            <span>Filter</span>
-          </motion.button>
+          <div>
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="rounded-lg border border-white/30 bg-white/10 backdrop-blur-sm px-3 py-2 text-sm text-cyan-100 focus:border-cyan-300 focus:outline-none"
+            >
+              <option value="all">All Roles</option>
+              <option value="Administrator">Administrator</option>
+              <option value="Technician">Technician</option>
+              <option value="Analyst">Analyst</option>
+              <option value="Guest">Guest</option>
+            </select>
+          </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="group relative inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-cyan-500/20 backdrop-blur-md text-white font-semibold border border-cyan-400/30 hover:bg-cyan-500/30 transition-all duration-300"
+            onClick={addUser}
+            className="group relative inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-cyan-500/20 backdrop-blur-md text-cyan-50 font-semibold border border-cyan-400/30 hover:bg-cyan-500/30 transition-all duration-300"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
             <UserPlus size={16} />
@@ -88,7 +119,7 @@ const Users = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <motion.tr
                   key={user.id}
                   whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
@@ -100,7 +131,7 @@ const Users = () => {
                         <UserRound className="text-cyan-300" size={20} />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-white">{user.name}</div>
+                        <div className="text-sm font-medium text-cyan-100">{user.name}</div>
                       </div>
                     </div>
                   </td>
@@ -118,12 +149,14 @@ const Users = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
+                      onClick={() => editUser(user.id)}
                       className="text-cyan-400 hover:text-cyan-300 mr-3"
                     >
                       Edit
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
+                      onClick={() => deleteUser(user.id)}
                       className="text-rose-400 hover:text-rose-300"
                     >
                       Delete
@@ -139,7 +172,7 @@ const Users = () => {
       {/* Pagination */}
       <div className="flex items-center justify-between mt-6">
         <div className="text-sm text-cyan-100">
-          Showing <span className="font-medium">1</span> to <span className="font-medium">4</span> of <span className="font-medium">4</span> users
+          Showing <span className="font-medium">1</span> to <span className="font-medium">{filteredUsers.length}</span> of <span className="font-medium">{filteredUsers.length}</span> users
         </div>
         <div className="flex gap-2">
           <motion.button
