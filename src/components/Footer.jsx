@@ -7,7 +7,7 @@ const Footer = () => {
       <div className="w-full flex flex-col sm:flex-row justify-between items-center px-4">
         <div className="flex items-center gap-2 mb-3 sm:mb-0">
           <Droplets className="text-emerald-400" size={18} />
-          <span className="text-white font-medium">AquaSense</span>
+          <span className="text-cyan-100 font-medium">AquaSense</span>
           <span className="text-emerald-200 text-sm ml-2">© {new Date().getFullYear()}</span>
         </div>
         

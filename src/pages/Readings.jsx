@@ -1,18 +1,135 @@
-import React from 'react';
-import { ImageIcon, HomeIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ImageIcon, HomeIcon, Droplets, Filter, Calendar } from 'lucide-react';
 import { useApp } from '../App';
 import { motion } from 'framer-motion';
 
 const Readings = () => {
-  const { setCurrentView } = useApp();
-  const cards = [
-    { id: 'r1', tag: 'NORMAL', time: 'Sep 25, 2025 2:30 PM', level: 12.46, battery: 3.65, img: 'https://images.unsplash.com/photo-1508186225823-0963cf9ab0de?auto=format&fit=crop&w=1200&q=60' },
-    { id: 'r2', tag: 'NORMAL', time: 'Sep 25, 2025 3:00 PM', level: 10.99, battery: 3.57, img: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=1200&q=60' },
-    { id: 'r3', tag: 'EQUIVOCAL', time: 'Sep 25, 2025 3:30 PM', level: 15.43, battery: 3.99, img: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=60' },
-    { id: 'r4', tag: 'NORMAL', time: 'Sep 25, 2025 4:00 PM', level: 11.25, battery: 3.72, img: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=60' },
-    { id: 'r5', tag: 'LOW', time: 'Sep 25, 2025 4:30 PM', level: 7.18, battery: 3.45, img: 'https://images.unsplash.com/photo-1475070929565-c985b496cb9f?auto=format&fit=crop&w=1200&q=60' },
-    { id: 'r6', tag: 'NORMAL', time: 'Sep 25, 2025 5:00 PM', level: 9.87, battery: 3.81, img: 'https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?auto=format&fit=crop&w=1200&q=60' },
-  ];
+  const { setCurrentView, selectedStation, setSelectedStation } = useApp();
+  const [stations, setStations] = useState([]);
+  const [readings, setReadings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const readingsPerPage = 6;
+
+  // Derive status from water_level
+  const getStatus = (waterLevel) => {
+    if (waterLevel < 8) return 'LOW';
+    if (waterLevel < 10) return 'EQUIVOCAL';
+    return 'NORMAL';
+  };
+
+  // Get status color classes
+  const getStatusClasses = (status) => {
+    switch (status) {
+      case 'NORMAL': return 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30';
+      case 'LOW': return 'bg-red-500/20 text-red-300 border border-red-400/30';
+      case 'EQUIVOCAL': return 'bg-amber-500/20 text-amber-300 border border-amber-400/30';
+      default: return 'bg-blue-500/20 text-blue-300 border border-blue-400/30';
+    }
+  };
+
+  useEffect(() => {
+    const fetchStations = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/stations');
+        if (response.ok) {
+          const data = await response.json();
+          setStations(data);
+          if (data.length > 0 && !selectedStation) {
+            setSelectedStation(data[0].id);
+          }
+        } else {
+          setError('Failed to fetch stations');
+        }
+      } catch (err) {
+        setError('Error fetching stations: ' + err.message);
+      }
+    };
+
+    fetchStations();
+  }, []);
+
+  useEffect(() => {
+    if (selectedStation) {
+      const fetchReadings = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const response = await fetch(`http://localhost:5000/station/${selectedStation}/trends`);
+          if (response.ok) {
+            const { trends } = await response.json();
+            // Map to readings format, mock battery
+            const mappedReadings = trends.map((item, index) => ({
+              id: `r${index + 1}`,
+              tag: getStatus(item.water_level),
+              time: new Date(item.date).toLocaleString(),
+              level: item.water_level,
+              battery: (3.5 + Math.random() * 0.5).toFixed(2), // Mock 3.5-4.0V
+              recharge: item.recharge_estimation
+            }));
+            setReadings(mappedReadings);
+          } else {
+            setError('Failed to fetch readings');
+          }
+        } catch (err) {
+          setError('Error fetching readings: ' + err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchReadings();
+    }
+  }, [selectedStation]);
+
+  // Apply filters (pure function, no side effects)
+  const applyFilters = () => {
+    let filtered = [...readings];
+
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(r => r.tag === filterStatus);
+    }
+
+    if (dateFrom) {
+      const fromDate = new Date(dateFrom);
+      filtered = filtered.filter(r => new Date(r.time) >= fromDate);
+    }
+
+    if (dateTo) {
+      const toDate = new Date(dateTo);
+      toDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(r => new Date(r.time) <= toDate);
+    }
+
+    return filtered;
+  };
+
+  const filteredReadings = applyFilters();
+  const totalPages = Math.ceil(filteredReadings.length / readingsPerPage);
+  const paginatedReadings = filteredReadings.slice(
+    (currentPage - 1) * readingsPerPage,
+    currentPage * readingsPerPage
+  );
+
+  if (loading) {
+    return (
+      <div className="h-full flex flex-col w-full items-center justify-center">
+        <div className="text-cyan-100 text-lg">Loading readings...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-full flex flex-col w-full items-center justify-center">
+        <div className="text-red-300 text-lg">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col w-full">
@@ -21,7 +138,7 @@ const Readings = () => {
         whileHover={{ scale: 1.05, y: -2 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setCurrentView('landing')}
-        className="group relative mb-6 inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/20 backdrop-blur-md text-white font-semibold shadow-xl hover:shadow-2xl border border-white/30 transition-all duration-300 self-start"
+        className="group relative mb-6 inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/20 backdrop-blur-md text-cyan-50 font-semibold shadow-xl hover:shadow-2xl border border-white/30 transition-all duration-300 self-start"
       >
         <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
         <HomeIcon size={18} />
@@ -29,46 +146,81 @@ const Readings = () => {
       </motion.button>
 
       <div className="mb-4 flex-1">
-        <h1 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-cyan-100 mb-2 flex items-center gap-2">
           <ImageIcon className="text-cyan-300" size={24} />
           Station Readings
         </h1>
         <p className="text-cyan-100 text-sm">
-          View captured images and readings from monitoring stations
+          View historical water level readings from monitoring stations
         </p>
       </div>
 
       {/* Filter Controls */}
       <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-6">
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 items-end">
           <div>
-            <label className="block text-sm font-medium text-cyan-100 mb-1">
-              Filter by Status
+            <label className="block text-sm font-medium text-cyan-100 mb-1 flex items-center gap-1">
+              <Filter size={14} /> Select Station
             </label>
-            <select className="rounded-lg border border-white/30 bg-white/10 backdrop-blur-sm px-3 py-2 text-sm text-white focus:border-cyan-300 focus:outline-none">
-              <option value="all">All Statuses</option>
-              <option value="normal">Normal</option>
-              <option value="low">Low</option>
-              <option value="equivocal">Equivocal</option>
+            <select
+              className="rounded-lg border border-white/30 bg-white/10 backdrop-blur-sm px-3 py-2 text-sm text-black focus:border-cyan-300 focus:outline-none"
+              value={selectedStation || ''}
+              onChange={(e) => setSelectedStation(parseInt(e.target.value))}
+            >
+              <option value="">Select a station</option>
+              {stations.map((station) => (
+                <option key={station.id} value={station.id}>
+                  {station.name}
+                </option>
+              ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-cyan-100 mb-1">
-              Date Range
+            <label className="block text-sm font-medium text-cyan-100 mb-1 flex items-center gap-1">
+              <Filter size={14} /> Filter by Status
+            </label>
+            <select
+              className="rounded-lg border border-white/30 bg-white/10 backdrop-blur-sm px-3 py-2 text-sm text-black focus:border-cyan-300 focus:outline-none"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <option value="all">All Statuses</option>
+              <option value="NORMAL">Normal</option>
+              <option value="LOW">Low</option>
+              <option value="EQUIVOCAL">Equivocal</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-cyan-100 mb-1 flex items-center gap-1">
+              <Calendar size={14} /> From Date
             </label>
             <input
               type="date"
-              className="rounded-lg border border-white/30 bg-white/10 backdrop-blur-sm px-3 py-2 text-sm text-white focus:border-cyan-300 focus:outline-none"
+              className="rounded-lg border border-white/30 bg-white/10 backdrop-blur-sm px-3 py-2 text-sm text-cyan-100 focus:border-cyan-300 focus:outline-none"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-cyan-100 mb-1 flex items-center gap-1">
+              <Calendar size={14} /> To Date
+            </label>
+            <input
+              type="date"
+              className="rounded-lg border border-white/30 bg-white/10 backdrop-blur-sm px-3 py-2 text-sm text-cyan-100 focus:border-cyan-300 focus:outline-none"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
             />
           </div>
           <div className="flex items-end">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="group relative inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-cyan-500/20 backdrop-blur-md text-white font-semibold border border-cyan-400/30 hover:bg-cyan-500/30 transition-all duration-300"
+              onClick={() => setCurrentPage(1)}
+              className="group relative inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-cyan-500/20 backdrop-blur-md text-cyan-50 font-semibold border border-cyan-400/30 hover:bg-cyan-500/30 transition-all duration-300"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-              Apply Filters
+              <Filter size={16} /> Apply Filters
             </motion.button>
           </div>
         </div>
@@ -76,88 +228,91 @@ const Readings = () => {
 
       {/* Reading Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
-        {cards.map((card, index) => (
-          <motion.div
-            key={card.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 hover:bg-white/15 transition-all duration-300"
-            whileHover={{ y: -2 }}
-          >
-            <div className="aspect-video bg-cyan-500/20 rounded-t-2xl overflow-hidden">
-              <img
-                src={card.img}
-                alt={`Reading ${card.id}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="p-4">
-              <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
-                card.tag === 'NORMAL' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' :
-                card.tag === 'LOW' ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :
-                'bg-blue-500/20 text-blue-300 border border-blue-400/30'
-              }`}>
-                {card.tag}
+        {paginatedReadings.length === 0 ? (
+          <div className="col-span-full flex items-center justify-center h-64 text-cyan-100">
+            No readings match the selected filters.
+          </div>
+        ) : (
+          paginatedReadings.map((card, index) => (
+            <motion.div
+              key={card.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 hover:bg-white/15 transition-all duration-300"
+              whileHover={{ y: -2 }}
+            >
+              <div className="aspect-video bg-cyan-500/20 rounded-t-2xl overflow-hidden flex items-center justify-center">
+                <Droplets className="text-cyan-300" size={48} />
               </div>
-              <h3 className="font-semibold text-white">{card.time}</h3>
-              <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
-                <div className="text-cyan-100">
-                  Water Level: <span className="font-medium text-white">{card.level}m</span>
+              <div className="p-4">
+                <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${getStatusClasses(card.tag)}`}>
+                  {card.tag}
                 </div>
-                <div className="text-cyan-100">
-                  Battery: <span className="font-medium text-white">{card.battery}V</span>
+                <h3 className="font-semibold text-cyan-100 text-sm mb-2">{card.time}</h3>
+                <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                  <div className="text-cyan-100">
+                    Water Level: <span className="font-medium text-cyan-50">{card.level.toFixed(2)}m</span>
+                  </div>
+                  <div className="text-cyan-100">
+                    Recharge: <span className="font-medium text-cyan-50">{card.recharge.toFixed(2)}m</span>
+                  </div>
+                  <div className="text-cyan-100">
+                    Battery: <span className="font-medium text-cyan-50">{card.battery}V</span>
+                  </div>
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-white/20 backdrop-blur-md text-cyan-50 font-medium border border-white/30 hover:bg-white/30 transition-all duration-300"
+                  >
+                    <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    View Details
+                  </motion.button>
                 </div>
               </div>
-              <div className="mt-4 flex justify-end">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  className="group relative inline-flex items-center px-4 py-2 rounded-xl bg-white/20 backdrop-blur-md text-white font-medium border border-white/30 hover:bg-white/30 transition-all duration-300"
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  View Details
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))
+        )}
       </div>
 
       {/* Pagination */}
-      <div className="mt-6 flex justify-center">
-        <nav className="flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/20">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="p-2 rounded-lg border border-white/30 bg-white/10 text-white hover:bg-white/20 transition-all duration-300"
-          >
-            &laquo;
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="p-2 rounded-lg border border-white/30 bg-white/10 text-white hover:bg-white/20 min-w-[2.5rem] text-center transition-all duration-300"
-          >
-            1
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="p-2 rounded-lg bg-cyan-500/20 text-cyan-100 border border-cyan-400/30 min-w-[2.5rem] text-center hover:bg-cyan-500/30 transition-all duration-300"
-          >
-            2
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="p-2 rounded-lg border border-white/30 bg-white/10 text-white hover:bg-white/20 min-w-[2.5rem] text-center transition-all duration-300"
-          >
-            3
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="p-2 rounded-lg border border-white/30 bg-white/10 text-white hover:bg-white/20 transition-all duration-300"
-          >
-            &raquo;
-          </motion.button>
-        </nav>
-      </div>
+      {totalPages > 1 && (
+        <div className="mt-6 flex justify-center">
+          <nav className="flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/20">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg border border-white/30 bg-white/10 text-cyan-100 hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              &laquo;
+            </motion.button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <motion.button
+                key={page}
+                whileHover={{ scale: 1.05 }}
+                onClick={() => setCurrentPage(page)}
+                className={`p-2 rounded-lg border border-white/30 min-w-[2.5rem] text-center transition-all duration-300 ${
+                  currentPage === page
+                    ? 'bg-cyan-500/20 text-cyan-100 border border-cyan-400/30'
+                    : 'bg-white/10 text-cyan-100 hover:bg-white/20'
+                }`}
+              >
+                {page}
+              </motion.button>
+            ))}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-lg border border-white/30 bg-white/10 text-cyan-100 hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              &raquo;
+            </motion.button>
+          </nav>
+        </div>
+      )}
     </div>
   );
 };

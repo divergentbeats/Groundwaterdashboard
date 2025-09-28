@@ -25,7 +25,7 @@ const Sidebar = () => {
             onClick={() => setCurrentView(item.label)}
             className={`flex items-center gap-3 p-2.5 rounded-lg transition-all duration-200 shadow-lg ${
               currentView === item.label
-                ? 'bg-emerald-700/50 text-white border border-emerald-600/30 shadow-emerald-500/25'
+                ? 'bg-emerald-700/50 text-cyan-50 border border-emerald-600/30 shadow-emerald-500/25'
                 : 'text-cyan-100 hover:bg-emerald-800/30 hover:text-emerald-100 hover:shadow-emerald-500/10'
             }`}
             whileHover={{ scale: 1.03 }}
