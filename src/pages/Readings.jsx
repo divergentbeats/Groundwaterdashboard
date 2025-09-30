@@ -4,7 +4,8 @@ import { useApp } from '../App';
 import { motion } from 'framer-motion';
 
 const Readings = () => {
-  const { setCurrentView, selectedStation, setSelectedStation } = useApp();
+  const { setCurrentView } = useApp();
+  const [selectedStation, setSelectedStation] = useState(null);
   const [stations, setStations] = useState([]);
   const [readings, setReadings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,6 +16,8 @@ const Readings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'table'
   const [liveReading, setLiveReading] = useState(null);
+  const [lastUpdatedStations, setLastUpdatedStations] = useState('');
+  const [lastUpdatedReadings, setLastUpdatedReadings] = useState('');
   const readingsPerPage = 6;
 
   // Derive status from water_level
@@ -41,6 +44,7 @@ const Readings = () => {
         if (response.ok) {
           const data = await response.json();
           setStations(data);
+          setLastUpdatedStations(new Date().toLocaleString());
           if (data.length > 0 && !selectedStation) {
             setSelectedStation(data[0].id);
           }
@@ -53,6 +57,8 @@ const Readings = () => {
     };
 
     fetchStations();
+    const interval = setInterval(fetchStations, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -61,22 +67,23 @@ const Readings = () => {
         setLoading(true);
         setError(null);
         try {
-          const response = await fetch(`http://localhost:5000/station/${selectedStation}/trends`);
+          const response = await fetch(`http://localhost:5000/station/${selectedStation}/readings`);
           if (response.ok) {
-            const { trends } = await response.json();
-            // Map to readings format, mock battery
-            const mappedReadings = trends.map((item, index) => ({
+            const { history } = await response.json();
+            // Map to readings format, mock battery and recharge
+            const mappedReadings = history.map((item, index) => ({
               id: `r${index + 1}`,
               tag: getStatus(item.water_level),
               time: new Date(item.date).toLocaleString(),
               level: item.water_level,
-              battery: item.type === 'live' ? (item.battery || (3.5 + Math.random() * 0.5).toFixed(2)) : (3.5 + Math.random() * 0.5).toFixed(2),
-              recharge: item.recharge_estimation
+              battery: 3.5 + Math.random() * 0.5,
+              recharge: 0.5 + Math.random() * 0.5
             }));
             setReadings(mappedReadings);
+            setLastUpdatedReadings(new Date().toLocaleString());
 
             // Check for live reading (latest within 5 minutes)
-            if (trends.length > 0 && trends[0].type === 'live') {
+            if (history.length > 0) {
               setLiveReading(mappedReadings[0]);
             } else {
               setLiveReading(null);
@@ -93,8 +100,8 @@ const Readings = () => {
 
       fetchReadings();
 
-      // Set up polling every 30 seconds
-      const interval = setInterval(fetchReadings, 30000);
+      // Set up polling every 60 seconds
+      const interval = setInterval(fetchReadings, 60000);
 
       return () => clearInterval(interval);
     }
@@ -153,6 +160,8 @@ const Readings = () => {
     document.body.removeChild(link);
   };
 
+
+
   if (loading) {
     return (
       <div className="h-full flex flex-col w-full items-center justify-center">
@@ -191,6 +200,11 @@ const Readings = () => {
         <p className="text-cyan-100 text-sm">
           View historical water level readings from monitoring stations
         </p>
+        {lastUpdatedStations && (
+          <p className="text-cyan-200 text-xs mt-1">
+            Stations last updated: {lastUpdatedStations}
+          </p>
+        )}
       </div>
 
       {/* View Toggle and Export */}
@@ -227,7 +241,7 @@ const Readings = () => {
           {liveReading && (
             <div className="flex items-center gap-2 text-emerald-300 text-sm">
               <RefreshCw size={14} className="animate-spin" />
-              Live data available
+              Live data available - Last updated: {lastUpdatedReadings}
             </div>
           )}
           <motion.button

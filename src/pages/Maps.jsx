@@ -13,7 +13,7 @@ const Maps = () => {
   const mapCenter = [21, 78]; // Center of India
 
   useEffect(() => {
-    const fetchStations = async () => {
+    const fetchStationsData = async () => {
       try {
         const response = await fetch('http://localhost:5000/stations');
         if (response.ok) {
@@ -25,7 +25,7 @@ const Maps = () => {
             liveStations = await liveResponse.json();
           }
           // Merge live data into stations
-          const mergedStations = data.map(station => {
+          let mergedStations = data.map(station => {
             const live = liveStations.find(l => l.station_id === station.id);
             if (live) {
               return {
@@ -38,7 +38,36 @@ const Maps = () => {
             }
             return { ...station, isLive: false };
           });
-          setStations(mergedStations);
+
+          // Fetch latest India-WRIS readings for each station
+          const updatedStations = await Promise.all(
+            mergedStations.map(async (station) => {
+              try {
+                const readingsResponse = await fetch(`http://localhost:5000/station/${station.id}/latest_readings`);
+                if (readingsResponse.ok) {
+                  const readingsData = await readingsResponse.json();
+                  const latestReadings = readingsData.latest_readings;
+                  if (latestReadings && latestReadings.length > 0) {
+                    const latest = latestReadings[0]; // Assuming sorted by newest first
+                    return {
+                      ...station,
+                      water_level: latest.water_level_m,
+                      recharge_pattern: latest.recharge_rate_mm_day,
+                      status: latest.status,
+                      battery: latest.battery,
+                      last_updated: latest.timestamp,
+                      isLive: true // Mark as live since real data
+                    };
+                  }
+                }
+              } catch (error) {
+                console.error(`Error fetching readings for station ${station.id}:`, error);
+              }
+              return station; // Return original if fetch fails
+            })
+          );
+
+          setStations(updatedStations);
         } else {
           console.error('Failed to fetch stations');
         }
@@ -49,7 +78,12 @@ const Maps = () => {
       }
     };
 
-    fetchStations();
+    fetchStationsData();
+
+    // Set up polling every 30 seconds for live updates
+    const interval = setInterval(fetchStationsData, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Color-coded icons based on status, with live indicator

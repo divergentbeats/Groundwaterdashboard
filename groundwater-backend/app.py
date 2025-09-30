@@ -11,18 +11,12 @@ import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 import os
 import random
-from data_ingestion import fetch_live_data
+from data_ingestion import fetch_indiawris_groundwater_data
 
-# Live DWLR Telemetry Feeds (Mock for demo - replace with real URLs if found)
-LIVE_STATION_FEEDS = {
-    3: "https://mock-cgwb-api.example.com/station/bangalore/live",  # Bangalore DWLR Station - mock URL
-    4: "https://mock-cgwb-api.example.com/station/chennai/live",  # Chennai DWLR Station - mock URL
-    21: "https://mock-cgwb-api.example.com/station/mysore/live",  # Mysore DWLR Station - mock URL
-    # Add more if real feeds found: e.g., "TN_CRMN_Station1": "https://public.cgwb.gov.in/crmn/station1_live.csv"
-}
+from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes to allow frontend requests
+CORS(app, resources={r"/*": {"origins": "*"}})  # Enable CORS for all origins and routes
 
 # Global models dict
 models = {}
@@ -50,13 +44,15 @@ def fetch_weather(lat, lon):
             return avg_precip, avg_temp
         else:
             return 0, 0  # Default if API fails
-    except:
+    except Exception as e:
+        print(f"Error fetching weather data: {e}")
         return 0, 0
 
 # Database connection helper
 def get_db_connection():
-    conn = sqlite3.connect('groundwater.db')
+    conn = sqlite3.connect('groundwater.db', timeout=30.0, check_same_thread=False)
     conn.row_factory = sqlite3.Row
+    conn.execute('PRAGMA journal_mode=WAL')
     return conn
 
 # Initialize database with sample data
@@ -146,9 +142,15 @@ def init_db():
             recharge_rate REAL NOT NULL,
             battery REAL NOT NULL,
             status TEXT NOT NULL,
+            source TEXT DEFAULT 'synthetic',
             FOREIGN KEY (station_id) REFERENCES stations (id)
         )
     ''')
+    # Add source column if not exists (for existing DBs)
+    try:
+        cursor.execute('ALTER TABLE live_readings ADD COLUMN source TEXT DEFAULT "synthetic"')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
 
     # Insert default global thresholds for each role (station_id NULL)
     # Adjusted for actual data range (400-500m bgl): normal >=500, warning >=450, critical >=400, emergency <400
@@ -243,11 +245,11 @@ def init_db():
     else:
         print("CSV not found, skipping load")
 
-    # Generate comprehensive synthetic data for all stations from 2024-01-01 to present
-    # This ensures at least a year's worth of data with variety for prototype
-    start_date = datetime(2024, 1, 1)
+    # Generate synthetic daily data for all stations from 365 days back to present
+    # Reduced to daily for faster startup while maintaining a year's data
+    start_date = datetime.now() - timedelta(days=365)
     end_date = datetime.now()
-    current_date = start_date
+    current_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)  # Start at midnight
 
     # Base levels for each station to create variety (m bgl)
     station_base_levels = {
@@ -258,7 +260,8 @@ def init_db():
     while current_date <= end_date:
         for station_id in range(1, 22):
             # Check if data already exists for this date
-            existing = cursor.execute('SELECT id FROM water_levels WHERE station_id = ? AND date = ?', (station_id, current_date.strftime('%Y-%m-%d'))).fetchone()
+            date_str = current_date.strftime('%Y-%m-%d')
+            existing = cursor.execute('SELECT id FROM water_levels WHERE station_id = ? AND date LIKE ?', (station_id, date_str + '%')).fetchone()
             if existing:
                 continue
 
@@ -273,12 +276,12 @@ def init_db():
             else:  # Summer (Feb-May)
                 seasonal_factor = 1.1  # Higher levels due to depletion
 
-            # Random fluctuation
-            fluctuation = random.uniform(-2, 2)
+            # Daily random fluctuation (larger than hourly)
+            fluctuation = random.uniform(-1.0, 1.0)
 
-            # Trend: slight decline over time for some stations
+            # Trend: slight decline over time
             days_since_start = (current_date - start_date).days
-            trend_factor = 1 + (days_since_start / 365) * 0.05  # 5% increase per year (deeper)
+            trend_factor = 1 + (days_since_start / 365) * 0.05  # 5% change per year
 
             level = base_level * seasonal_factor * trend_factor + fluctuation
             level = max(1, level)  # Ensure positive
@@ -294,9 +297,9 @@ def init_db():
                 pattern = 'Normal'
 
             cursor.execute('INSERT INTO water_levels (station_id, date, water_level, recharge_pattern) VALUES (?, ?, ?, ?)',
-                           (station_id, current_date.strftime('%Y-%m-%d'), round(level, 2), pattern))
+                           (station_id, date_str, round(level, 2), pattern))
 
-        current_date += timedelta(days=30)  # Monthly data points for density
+        current_date += timedelta(days=1)  # Daily data points
 
     # Generate initial predictions for each station
     for station_id in range(1, 22):
@@ -363,7 +366,7 @@ def calculate_wtf(current_level, prev_level, time_delta_hours=1, sy=0.1):
     Positive: recharge (rising), Negative: depletion (falling).
     Sy default 0.1 for unconfined aquifer.
     """
-    if prev_level is None:
+    if prev_level is None or time_delta_hours <= 0:
         return 0.0
     delta_level = current_level - prev_level
     recharge_rate = sy * delta_level / time_delta_hours
@@ -494,11 +497,14 @@ def get_stations():
 
     result = []
     for station in stations:
+        # Prioritize live reading if within last 24 hours, else historical
         latest_level_row = conn.execute('''
-            SELECT water_level FROM water_levels
-            WHERE station_id = ?
-            ORDER BY date DESC LIMIT 1
-        ''', (station['id'],)).fetchone()
+            SELECT water_level FROM (
+                SELECT water_level, timestamp FROM live_readings WHERE station_id = ? AND timestamp > datetime('now', '-1 day')
+                UNION ALL
+                SELECT water_level, date as timestamp FROM water_levels WHERE station_id = ?
+            ) ORDER BY timestamp DESC LIMIT 1
+        ''', (station['id'], station['id'])).fetchone()
         latest_level = latest_level_row['water_level'] if latest_level_row else None
 
         # Get latest prediction from DB
@@ -1054,27 +1060,34 @@ def predict_water_level(station_id):
 @app.route('/station/<int:station_id>/trends', methods=['GET'])
 def get_station_trends(station_id):
     """
-    Returns time-series data for last 30 days: date, water_level, recharge_estimation.
+    Returns time-series data for last N days: date, water_level, recharge_estimation.
     Includes predicted future points from predictions table.
     Recharge estimation mocked as simple delta from previous day (positive=rising, negative=falling).
     """
+    days = request.args.get('days', 90)
+    try:
+        days = int(days)
+    except ValueError:
+        days = 90
+
     conn = get_db_connection()
-    trends = conn.execute('''
+    query = """
         SELECT date, water_level FROM water_levels
-        WHERE station_id = ? AND date >= datetime('now', '-30 days')
+        WHERE station_id = ? AND date >= datetime('now', '-{} days')
         ORDER BY date ASC
-    ''', (station_id,)).fetchall()
+    """.format(days)
+    trends = conn.execute(query, (station_id,)).fetchall()
     predictions = conn.execute('SELECT date, predicted_level FROM predictions WHERE station_id = ? ORDER BY date ASC', (station_id,)).fetchall()
 
-    # Fetch live readings for last 24 hours
+    # Fetch live readings for last N hours (assuming days * 24)
     from datetime import datetime, timedelta
-    twenty_four_hours_ago = (datetime.now() - timedelta(hours=24)).isoformat()
+    live_hours_ago = (datetime.now() - timedelta(hours=days * 24)).isoformat()
     live_trends = conn.execute('''
         SELECT timestamp as date, water_level, recharge_rate as recharge_estimation, battery
         FROM live_readings
         WHERE station_id = ? AND timestamp > ?
         ORDER BY timestamp ASC
-    ''', (station_id, twenty_four_hours_ago)).fetchall()
+    ''', (station_id, live_hours_ago)).fetchall()
 
     conn.close()
 
@@ -1663,65 +1676,64 @@ def update_live_readings():
 
 def fetch_and_store_live_telemetry():
     """
-    Fetch live telemetry data from configured DWLR feeds and store in live_readings table.
-    Currently mock implementation - replace with real API calls when feeds are found.
-    Uses WTF for recharge_rate: fetches prev_level from last live_reading or historical water_level.
-    time_delta_hours = 1/60 ≈ 0.0167.
+    Fetch live telemetry data from configured DWLR feeds using fetch_live_data().
+    Calls fetch_live_data() for stations in LIVE_STATION_FEEDS.
     """
-    time_delta_hours = 1 / 60  # 1 minute interval
+    fetch_live_data(list(LIVE_STATION_FEEDS.keys()))
 
-    for station_id, feed_url in LIVE_STATION_FEEDS.items():
-        try:
-            # Mock telemetry data (replace with real API call)
-            # Example: response = requests.get(feed_url)
-            # data = response.json() if response.status_code == 200 else None
-
-            # Get base_level from latest historical
-            conn = get_db_connection()
-            hist_row = conn.execute('SELECT water_level FROM water_levels WHERE station_id = ? ORDER BY date DESC LIMIT 1', (station_id,)).fetchone()
-
-            # Get last live_reading for prev_level and prev_timestamp
-            live_row = conn.execute('''
-                SELECT water_level, timestamp FROM live_readings
-                WHERE station_id = ? ORDER BY timestamp DESC LIMIT 1
-            ''', (station_id,)).fetchone()
+# New endpoint to fetch latest 7 readings per station from live_readings table
+@app.route('/station/<int:station_id>/latest_readings', methods=['GET'])
+def get_station_latest_readings(station_id):
+    try:
+        conn = get_db_connection()
+        # Get station name
+        station_row = conn.execute('SELECT name FROM stations WHERE id = ?', (station_id,)).fetchone()
+        if not station_row:
             conn.close()
+            return jsonify({"error": "Station not found"}), 404
+        station_name = station_row['name']
 
-            if not hist_row:
-                continue
+        # Get latest 7 readings from live_readings
+        readings = conn.execute('''
+            SELECT timestamp, water_level, recharge_rate, battery, status
+            FROM live_readings
+            WHERE station_id = ?
+            ORDER BY timestamp DESC
+            LIMIT 7
+        ''', (station_id,)).fetchall()
+        conn.close()
 
-            base_level = hist_row['water_level']
-            prev_level = live_row['water_level'] if live_row else base_level
-            prev_timestamp = live_row['timestamp'] if live_row else None
-
-            # If no prev_timestamp, assume 1h delta as fallback
-            actual_delta_hours = time_delta_hours if prev_timestamp else 1.0
-
-            # Generate current_level with ±0.2m variation for telemetry
-            current_level = base_level + random.uniform(-0.2, 0.2)
-            recharge_rate = calculate_wtf(current_level, prev_level, actual_delta_hours)
-            battery = random.uniform(85, 100)  # Better battery for telemetry stations
-            status = 'active'
-            timestamp = datetime.now().isoformat()
-
-            # Store in live_readings
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute('INSERT INTO live_readings (station_id, timestamp, water_level, recharge_rate, battery, status) VALUES (?, ?, ?, ?, ?, ?)',
-                           (station_id, timestamp, current_level, recharge_rate, battery, status))
-            conn.commit()
-            conn.close()
-
-            print(f"Live telemetry stored for station {station_id}: {current_level:.2f}m bgl")
-
-        except Exception as e:
-            print(f"Error fetching live telemetry for station {station_id}: {str(e)}")
+        # Format response
+        response = []
+        for r in readings:
+            response.append({
+                "station_name": station_name,
+                "timestamp": r["timestamp"],
+                "water_level_m": r["water_level"],
+                "recharge_rate_mm_day": r["recharge_rate"],
+                "status": r["status"],
+                "battery": r["battery"]
+            })
+        return jsonify({"station_id": station_id, "latest_readings": response})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    init_db()
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(update_predictions, 'interval', minutes=15)
-    scheduler.add_job(update_live_readings, 'interval', minutes=5)
-    scheduler.add_job(fetch_and_store_live_telemetry, 'interval', minutes=1)
-    scheduler.start()
-    app.run(debug=True)
+    import sys
+    if 'waitress' in sys.modules:
+        # Running with waitress, no need to call app.run()
+        init_db()
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(update_predictions, 'interval', seconds=3600)
+        scheduler.add_job(update_live_readings, 'interval', seconds=3600)
+        scheduler.add_job(fetch_and_store_live_telemetry, 'interval', seconds=3600)
+        scheduler.start()
+    else:
+        # Development mode without reloader for stability
+        init_db()
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(update_predictions, 'interval', seconds=3600)
+        scheduler.add_job(update_live_readings, 'interval', seconds=3600)
+        scheduler.add_job(fetch_and_store_live_telemetry, 'interval', seconds=3600)
+        scheduler.start()
+        app.run(debug=False, use_reloader=False)

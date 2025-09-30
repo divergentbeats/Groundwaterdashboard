@@ -1,44 +1,48 @@
-import sqlite3
-import datetime
-import random
+import requests
+import csv
+import io
+from datetime import datetime
 
-def get_db_connection():
-    conn = sqlite3.connect('groundwater.db')
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def fetch_live_data():
+def fetch_indiawris_groundwater_data(api_key, station_ids):
     """
-    Fetch live DWLR data (mocked for prototype).
-    Generates realistic data based on latest water levels for all 20 stations and stores in live_readings table.
+    Fetch groundwater data from India-WRIS or CGWB WIMS authenticated API or CSV download.
+    This is a simulated function. Replace URL and parsing logic with actual API details.
+    Args:
+        api_key (str): API key or token for authentication.
+        station_ids (list): List of station IDs to fetch data for.
+    Returns:
+        dict: Mapping of station_id to list of latest 7 readings sorted newest first.
     """
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    # Example URL - replace with actual API endpoint or CSV download URL
+    url = "https://example.com/indiawris/groundwater_data.csv"
+    headers = {
+        "Authorization": f"Bearer {api_key}"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        raise Exception(f"Failed to fetch data: {response.status_code}")
 
-    # Get all station IDs
-    stations = cursor.execute('SELECT id FROM stations').fetchall()
+    data = {}
+    csvfile = io.StringIO(response.text)
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        station_id = row.get("station_id")
+        if station_id not in station_ids:
+            continue
+        reading = {
+            "station_name": row.get("station_name"),
+            "timestamp": datetime.strptime(row.get("timestamp"), "%Y-%m-%d %H:%M"),
+            "water_level": float(row.get("water_level_m", 0)),
+            "recharge_rate": float(row.get("recharge_rate_mm_day", 0)),
+            "status": row.get("status"),
+            "battery": float(row.get("battery", 0))
+        }
+        if station_id not in data:
+            data[station_id] = []
+        data[station_id].append(reading)
 
-    for station in stations:
-        station_id = station['id']
+    # Sort readings newest first and limit to latest 7
+    for sid in data:
+        data[sid] = sorted(data[sid], key=lambda x: x["timestamp"], reverse=True)[:7]
 
-        # Get latest water level from water_levels
-        latest_level_row = cursor.execute('SELECT water_level FROM water_levels WHERE station_id = ? ORDER BY date DESC LIMIT 1', (station_id,)).fetchone()
-        base_level = latest_level_row['water_level'] if latest_level_row else random.uniform(5.0, 50.0)
-
-        # Generate mock data with variation from latest level
-        water_level = round(base_level + random.uniform(-1.0, 1.0), 2)  # Slight variation
-        water_level = max(1.0, water_level)  # Minimum 1m
-        recharge_rate = round(random.uniform(0.0, 5.0), 2)  # 0-5 units
-        battery = round(random.uniform(80.0, 100.0), 1)  # 80-100%
-        status = 'active'  # All active for now
-        timestamp = datetime.datetime.now().isoformat()
-
-        # Insert into live_readings
-        cursor.execute('''
-            INSERT INTO live_readings (station_id, timestamp, water_level, recharge_rate, battery, status)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (station_id, timestamp, water_level, recharge_rate, battery, status))
-
-    conn.commit()
-    conn.close()
-    print("Live DWLR data fetched and stored (mocked).")
+    return data

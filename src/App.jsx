@@ -1114,16 +1114,14 @@ const Landing = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <motion.button
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+              <button
                 onClick={() => setCurrentView('Dashboard')}
                 className="group relative overflow-hidden inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/20 backdrop-blur-md text-white font-semibold shadow-xl hover:shadow-2xl border border-white/30 transition-all duration-300"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Waves size={20} />
                 <span>Explore Dashboard</span>
-              </motion.button>
+              </button>
 
               <motion.button
                 whileHover={{ scale: 1.05, y: -2 }}
@@ -1313,6 +1311,11 @@ function App() {
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
+
+  // Add debug log for currentView changes
+  React.useEffect(() => {
+    console.log('Current view changed to:', currentView);
+  }, [currentView]);
 
   // App context value
   const appContextValue = useMemo(() => ({

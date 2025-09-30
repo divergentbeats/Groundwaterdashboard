@@ -4,7 +4,14 @@ import numpy as np
 
 # Load existing CSV
 df = pd.read_csv('data/cgwb_historical.csv')
-df['Date'] = pd.to_datetime(df['Date'])
+print("Original Date column types:", df['Date'].dtype)
+print("Sample Date values:", df['Date'].head())
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+print("After conversion Date column types:", df['Date'].dtype)
+print("Sample Date values after conversion:", df['Date'].head())
+df = df.dropna(subset=['Date'])  # Remove any rows where date couldn't be parsed
+print("After dropna Date column types:", df['Date'].dtype)
+print("Sample Date values after dropna:", df['Date'].head())
 
 # Existing stations from CSV
 existing_stations = df['District'].unique().tolist()
@@ -50,10 +57,11 @@ missing_base = {
 }
 
 # Target date
-target_date = datetime(2025, 9, 28)
+target_date = datetime(2025, 12, 31)
 
-# Step 1: Project for existing stations (add 2025-09-28 row)
+# Step 1: Project for existing stations (add 2025-12-31 row)
 new_rows = []
+projected_levels = {}
 for district in existing_stations:
     station_df = df[df['District'] == district].copy()
     station_df = station_df.sort_values('Date')
@@ -69,6 +77,7 @@ for district in existing_stations:
     months_diff = days_diff / 30.0
     projected_level = last_level + increment * months_diff
     last_pattern = station_df['Recharge_Pattern'].iloc[-1]
+    projected_levels[district] = projected_level
     new_row = {
         'Date': target_date.strftime('%Y-%m-%d'),
         'District': district,
@@ -113,13 +122,13 @@ while current_date <= end_date:
         missing_rows.append(row)
     current_date = (current_date + delta).replace(day=1)
 
-# Add projection for missing stations
+# Add projection for missing stations up to Sep 2025
 for district, (base_level, increment, base_pattern) in missing_base.items():
     months_passed = 32  # Jan 2023 to Sep 2025
     last_level = base_level + increment * months_passed
     projected_level = last_level + increment * (27 / 30.0)  # Approx for 28th
     row = {
-        'Date': target_date.strftime('%Y-%m-%d'),
+        'Date': datetime(2025, 9, 28).strftime('%Y-%m-%d'),
         'District': district,
         'State': all_stations[district]['state'],
         'Latitude': all_stations[district]['lat'],
@@ -129,6 +138,64 @@ for district, (base_level, increment, base_pattern) in missing_base.items():
     }
     missing_rows.append(row)
 
+# Step 3: Add weekly data for Oct-Dec 2025 for all stations
+weekly_start = datetime(2025, 10, 1)
+weekly_end = datetime(2025, 12, 31)
+current_week = weekly_start
+delta_week = pd.DateOffset(days=7)
+all_districts = list(all_stations.keys())
+
+for district in all_districts:
+    sep_date = datetime(2025, 9, 28)
+    dec_date = datetime(2025, 12, 31)
+    if district in existing_stations:
+        # For existing stations, sep_level is the last level before projection, dec_level is projected
+        station_df = df[df['District'] == district].copy()
+        station_df = station_df.sort_values('Date')
+        sep_level = station_df['Water_Level_m_bgl'].iloc[-1]  # last before adding new
+        dec_level = projected_levels[district]
+        state = station_df['State'].iloc[0]
+        lat = station_df['Latitude'].iloc[0]
+        lon = station_df['Longitude'].iloc[0]
+        pattern = station_df['Recharge_Pattern'].iloc[-1]
+    else:
+        # For missing stations, use the base increment
+        base_level, increment, base_pattern = missing_base[district]
+        months_passed_sep = 32  # to Sep
+        sep_level = base_level + increment * months_passed_sep + increment * (27/30.0)
+        months_passed_dec = 35  # to Dec
+        dec_level = base_level + increment * months_passed_dec
+        state = all_stations[district]['state']
+        lat = all_stations[district]['lat']
+        lon = all_stations[district]['lon']
+        pattern = base_pattern
+
+    total_days = (dec_date - sep_date).days
+    level_diff = dec_level - sep_level
+    current_week = weekly_start
+    while current_week <= weekly_end:
+        days_from_sep = (current_week - sep_date).days
+        interpolated_level = sep_level + (level_diff * days_from_sep / total_days) if total_days > 0 else sep_level
+        if interpolated_level > 200:
+            wk_pattern = 'Critical'
+        elif interpolated_level > 100:
+            wk_pattern = 'Warning'
+        elif interpolated_level > 50:
+            wk_pattern = 'Low'
+        else:
+            wk_pattern = pattern
+        row = {
+            'Date': current_week.strftime('%Y-%m-%d'),
+            'District': district,
+            'State': state,
+            'Latitude': lat,
+            'Longitude': lon,
+            'Water_Level_m_bgl': round(interpolated_level, 2),
+            'Recharge_Pattern': wk_pattern
+        }
+        missing_rows.append(row)  # using missing_rows list for all additional rows
+        current_week += delta_week
+
 missing_df = pd.DataFrame(missing_rows)
 df = pd.concat([df, missing_df], ignore_index=True)
 
@@ -137,4 +204,4 @@ df = df.sort_values(['District', 'Date'])
 
 # Save updated CSV
 df.to_csv('data/cgwb_historical.csv', index=False)
-print('CSV updated with projected data for all 21 stations up to 2025-09-28.')
+print('CSV updated with projected data for all 21 stations up to 2025-12-31, with weekly data for Oct-Dec 2025.')
