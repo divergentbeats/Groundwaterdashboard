@@ -30,6 +30,59 @@ const Alerts = () => {
             station: alert.station_name,
             stationId: alert.station_id
           }));
+
+          // Enhance with additional mock alerts if backend has few
+          if (mappedAlerts.length < 5) {
+            const mockAlerts = [
+              {
+                id: 'mock-1',
+                type: 'critical',
+                title: 'Critical Water Level Drop',
+                message: 'Water level has dropped below critical threshold at Station Alpha.',
+                time: new Date(Date.now() - 2 * 60 * 60 * 1000).toLocaleString(),
+                station: 'Station Alpha',
+                stationId: 1
+              },
+              {
+                id: 'mock-2',
+                type: 'warning',
+                title: 'Recharge Rate Anomaly',
+                message: 'Unusual recharge rate detected at Station Beta.',
+                time: new Date(Date.now() - 4 * 60 * 60 * 1000).toLocaleString(),
+                station: 'Station Beta',
+                stationId: 2
+              },
+              {
+                id: 'mock-3',
+                type: 'info',
+                title: 'Maintenance Scheduled',
+                message: 'Routine maintenance scheduled for Station Gamma tomorrow.',
+                time: new Date(Date.now() - 6 * 60 * 60 * 1000).toLocaleString(),
+                station: 'Station Gamma',
+                stationId: 3
+              },
+              {
+                id: 'mock-4',
+                type: 'success',
+                title: 'System Update Completed',
+                message: 'Firmware update successfully applied to all stations.',
+                time: new Date(Date.now() - 8 * 60 * 60 * 1000).toLocaleString(),
+                station: 'All Stations',
+                stationId: null
+              },
+              {
+                id: 'mock-5',
+                type: 'warning',
+                title: 'Battery Low Alert',
+                message: 'Battery level below 20% at Station Delta.',
+                time: new Date(Date.now() - 10 * 60 * 60 * 1000).toLocaleString(),
+                station: 'Station Delta',
+                stationId: 4
+              }
+            ];
+            mappedAlerts.push(...mockAlerts);
+          }
+
           setAlerts(mappedAlerts);
 
           // Calculate summary

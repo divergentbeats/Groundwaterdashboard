@@ -14,6 +14,12 @@ const Users = () => {
     { id: 2, name: 'Field Technician', email: 'tech@aquasense.org', role: 'Technician', status: 'Active' },
     { id: 3, name: 'Data Analyst', email: 'analyst@aquasense.org', role: 'Analyst', status: 'Away' },
     { id: 4, name: 'Guest User', email: 'guest@aquasense.org', role: 'Guest', status: 'Inactive' },
+    { id: 5, name: 'John Farmer', email: 'john.farmer@aquasense.org', role: 'Farmer', status: 'Active' },
+    { id: 6, name: 'Sarah Policymaker', email: 'sarah.policy@aquasense.org', role: 'Policymaker', status: 'Active' },
+    { id: 7, name: 'Mike Stakeholder', email: 'mike.stakeholder@aquasense.org', role: 'Stakeholder', status: 'Away' },
+    { id: 8, name: 'Anna Planner', email: 'anna.planner@aquasense.org', role: 'Planner', status: 'Active' },
+    { id: 9, name: 'Raj Farmer', email: 'raj.farmer@aquasense.org', role: 'Farmer', status: 'Active' },
+    { id: 10, name: 'Lisa Policymaker', email: 'lisa.policy@aquasense.org', role: 'Policymaker', status: 'Inactive' },
   ]);
 
   const filteredUsers = users.filter(user => {
