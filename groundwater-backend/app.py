@@ -972,8 +972,8 @@ def get_station_readings(station_id):
     Used for charts showing historical water-level trends.
     """
     conn = get_db_connection()
-    water_levels = conn.execute('SELECT date, water_level FROM water_levels WHERE station_id = ? ORDER BY date',
-                               (station_id,)).fetchall()
+    water_levels = conn.execute('SELECT date, water_level FROM water_levels WHERE station_id = ? AND date >= ? AND date < ? ORDER BY date DESC',
+                               (station_id, '2025-01-01', '2026-01-01')).fetchall()
     conn.close()
     if not water_levels:
         return jsonify({'error': 'Station not found'}), 404
