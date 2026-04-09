@@ -1681,6 +1681,29 @@ def fetch_and_store_live_telemetry():
     """
     fetch_live_data(list(LIVE_STATION_FEEDS.keys()))
 
+# Application startup helpers
+
+_scheduler_started = False
+
+
+def start_background_jobs():
+    global _scheduler_started
+    if _scheduler_started:
+        return
+
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(update_predictions, 'interval', seconds=3600)
+    scheduler.add_job(update_live_readings, 'interval', seconds=3600)
+    scheduler.add_job(fetch_and_store_live_telemetry, 'interval', seconds=3600)
+    scheduler.start()
+    _scheduler_started = True
+
+
+def initialize_application():
+    init_db()
+    start_background_jobs()
+
+
 # New endpoint to fetch latest 7 readings per station from live_readings table
 @app.route('/station/<int:station_id>/latest_readings', methods=['GET'])
 def get_station_latest_readings(station_id):
@@ -1718,22 +1741,9 @@ def get_station_latest_readings(station_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+initialize_application()
+
+
 if __name__ == '__main__':
-    import sys
-    if 'waitress' in sys.modules:
-        # Running with waitress, no need to call app.run()
-        init_db()
-        scheduler = BackgroundScheduler()
-        scheduler.add_job(update_predictions, 'interval', seconds=3600)
-        scheduler.add_job(update_live_readings, 'interval', seconds=3600)
-        scheduler.add_job(fetch_and_store_live_telemetry, 'interval', seconds=3600)
-        scheduler.start()
-    else:
-        # Development mode without reloader for stability
-        init_db()
-        scheduler = BackgroundScheduler()
-        scheduler.add_job(update_predictions, 'interval', seconds=3600)
-        scheduler.add_job(update_live_readings, 'interval', seconds=3600)
-        scheduler.add_job(fetch_and_store_live_telemetry, 'interval', seconds=3600)
-        scheduler.start()
-        app.run(debug=False, use_reloader=False)
+    # Development mode without reloader for stability
+    app.run(debug=False, use_reloader=False)

@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: groundwater-backend
+    env: python
+    rootDir: groundwater-backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: waitress-serve --port=$PORT app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
