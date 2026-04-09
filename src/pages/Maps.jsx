@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { MapPin, Home as HomeIcon } from 'lucide-react';
 import { useApp } from '../App';
+import { getApiUrl } from '../utils/api-config';
 
 // Map View Component
 const Maps = () => {
@@ -15,11 +16,11 @@ const Maps = () => {
   useEffect(() => {
     const fetchStationsData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/stations');
+        const response = await fetch(getApiUrl('/stations'));
         if (response.ok) {
           const data = await response.json();
           // Fetch live stations
-          const liveResponse = await fetch('http://localhost:5000/stations/live');
+          const liveResponse = await fetch(getApiUrl('/stations/live'));
           let liveStations = [];
           if (liveResponse.ok) {
             liveStations = await liveResponse.json();
@@ -43,7 +44,7 @@ const Maps = () => {
           const updatedStations = await Promise.all(
             mergedStations.map(async (station) => {
               try {
-                const readingsResponse = await fetch(`http://localhost:5000/station/${station.id}/latest_readings`);
+                const readingsResponse = await fetch(getApiUrl(`/station/${station.id}/latest_readings`));
                 if (readingsResponse.ok) {
                   const readingsData = await readingsResponse.json();
                   const latestReadings = readingsData.latest_readings;

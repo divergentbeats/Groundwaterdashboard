@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, Calendar, Filter, Home as HomeIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { getApiUrl } from '../utils/api-config';
 import {
   ResponsiveContainer,
   LineChart,
@@ -24,7 +25,7 @@ const Trends = () => {
   useEffect(() => {
     const fetchStations = async () => {
       try {
-        const response = await fetch('http://localhost:5000/stations');
+        const response = await fetch(getApiUrl('/stations'));
         if (response.ok) {
           const data = await response.json();
           setStations(data);
@@ -47,13 +48,13 @@ const Trends = () => {
       const fetchTrends = async () => {
         setLoading(true);
         try {
-          const response = await fetch(`http://localhost:5000/station/${selectedStation}/trends`);
+          const response = await fetch(getApiUrl(`/station/${selectedStation}/trends`));
           if (response.ok) {
             const data = await response.json();
             let trends = data.trends;
             // If station 4, fetch live readings and prepend
             if (selectedStation === 4) {
-              const liveResponse = await fetch(`http://localhost:5000/station/${selectedStation}/live`);
+              const liveResponse = await fetch(getApiUrl(`/station/${selectedStation}/live`));
               if (liveResponse.ok) {
                 const liveData = await liveResponse.json();
                 // Add live readings to trends, assuming liveData is array of {timestamp, water_level}

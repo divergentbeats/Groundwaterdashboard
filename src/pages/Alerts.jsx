@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Bell, AlertTriangle, Info, CheckCircle, HomeIcon } from 'lucide-react';
 import { useApp } from '../App';
 import { motion } from 'framer-motion';
+import { getApiUrl } from '../utils/api-config';
 
 const Alerts = () => {
   const { setCurrentView, setSelectedStation } = useApp();
@@ -17,7 +18,7 @@ const Alerts = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('http://localhost:5000/alerts');
+        const response = await fetch(getApiUrl('/alerts'));
         if (response.ok) {
           const data = await response.json();
           // Map backend data to component format
@@ -112,7 +113,7 @@ const Alerts = () => {
 
   const resolveAlert = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/alerts/${id}/resolve`, {
+      const response = await fetch(getApiUrl(`/alerts/${id}/resolve`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });

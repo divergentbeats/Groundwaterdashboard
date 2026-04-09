@@ -3,6 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import { motion } from 'framer-motion';
 
 import Layout from './components/Layout';
+import { getApiUrl } from './utils/api-config';
 
 // Import page components
 import Maps from './pages/Maps';
@@ -81,7 +82,7 @@ const FarmerSection = () => {
     const fetchFarmerData = async () => {
       try {
         // Fetch from API; fallback to mock
-        const response = await fetch('http://localhost:5000/stations?role=farmer&days=7');
+        const response = await fetch(getApiUrl('/stations?role=farmer&days=7'));
         let data = [];
         if (response.ok) {
           data = await response.json();
@@ -242,7 +243,7 @@ const PolicymakerSection = () => {
   React.useEffect(() => {
     const fetchPolicyData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/stations?role=policymaker');
+        const response = await fetch(getApiUrl('/stations?role=policymaker'));
         let data = [];
         if (response.ok) {
           data = await response.json();
@@ -442,7 +443,7 @@ const PlannerSection = () => {
   React.useEffect(() => {
     const fetchPlannerData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/stations?role=planner');
+        const response = await fetch(getApiUrl('/stations?role=planner'));
         let data = [];
         if (response.ok) {
           data = await response.json();
@@ -662,7 +663,7 @@ const StakeholderSection = () => {
   React.useEffect(() => {
     const fetchStakeholderData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/stations?role=stakeholder');
+        const response = await fetch(getApiUrl('/stations?role=stakeholder'));
         let data = [];
         if (response.ok) {
           data = await response.json();
@@ -884,7 +885,7 @@ const Landing = () => {
   React.useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/stations?role=${role}`);
+        const response = await fetch(getApiUrl(`/stations?role=${role}`));
         if (response.ok) {
           const data = await response.json();
           const avgLevel = data.reduce((sum, s) => sum + (s.water_level || 0), 0) / data.length;

@@ -26,6 +26,16 @@ pids
 *.seed
 *.pid.lock
 
+# Local Python environments and caches
+.venv/
+groundwater-backend/.venv/
+groundwater-backend/venv311/
+groundwater-backend/__pycache__/
+*.pyc
+
+# Local SQLite database
+groundwater-backend/groundwater.db
+
 # Coverage directory used by tools like istanbul
 coverage/
 
