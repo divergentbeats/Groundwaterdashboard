@@ -4,6 +4,7 @@ import L from 'leaflet';
 import { Droplets, TrendingUp, BellRing, MapPin, Home as HomeIcon, LineChart as LineChartIcon, BarChart3, CloudRain, Leaf, AlertTriangle, Download, Settings, Users, Shield, BookOpen } from 'lucide-react';
 import { useApp } from '../App';
 import { motion } from 'framer-motion';
+import { getApiUrl } from '../utils/api-config';
 import {
   ResponsiveContainer,
   LineChart,
@@ -312,7 +313,7 @@ const PlannerDashboard = ({ data, setCurrentView }) => {
     setScenario(newScenario);
     // Fetch scenario data
     try {
-      const response = await fetch(`http://localhost:5000/dashboard/planner?scenario=${newScenario}`);
+      const response = await fetch(getApiUrl(`/dashboard/planner?scenario=${newScenario}`));
       if (response.ok) {
         const newData = await response.json();
         setScenarioData(newData);
@@ -619,7 +620,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        let url = `http://localhost:5000/dashboard/${role}`;
+        let url = getApiUrl(`/dashboard/${role}`);
 
         if (role === 'farmer') {
           // Get user location for farmer dashboard

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ImageIcon, HomeIcon, Droplets, Filter, Calendar, Grid3X3, Table, Download, RefreshCw } from 'lucide-react';
 import { useApp } from '../App';
 import { motion } from 'framer-motion';
+import { getApiUrl } from '../utils/api-config';
 
 const Readings = () => {
   const { setCurrentView } = useApp();
@@ -40,7 +41,7 @@ const Readings = () => {
   useEffect(() => {
     const fetchStations = async () => {
       try {
-        const response = await fetch('http://localhost:5000/stations');
+        const response = await fetch(getApiUrl('/stations'));
         if (response.ok) {
           const data = await response.json();
           setStations(data);
@@ -67,7 +68,7 @@ const Readings = () => {
         setLoading(true);
         setError(null);
         try {
-          const response = await fetch(`http://localhost:5000/station/${selectedStation}/readings`);
+          const response = await fetch(getApiUrl(`/station/${selectedStation}/readings`));
           if (response.ok) {
             const { history } = await response.json();
             // Map to readings format, mock battery and recharge
